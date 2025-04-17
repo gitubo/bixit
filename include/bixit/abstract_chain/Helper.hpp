@@ -4,7 +4,7 @@
 #include <algorithm> 
 #include <type_traits> 
 
-namespace chain_utils {
+namespace bixit::abstract_chain {
 
     enum class Endianness {
         BIG,

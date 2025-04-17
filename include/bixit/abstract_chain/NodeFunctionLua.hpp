@@ -4,7 +4,7 @@
 #include <luajit-2.1/lua.hpp>
 #include "ChainNode.hpp"
 
-namespace datacarder {
+namespace bixit::abstract_chain {
 
     class NodeFunctionLua : public ChainNode {
     private:

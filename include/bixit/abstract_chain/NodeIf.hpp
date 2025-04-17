@@ -1,8 +1,9 @@
 #pragma once
 
+#include <bixit/logger/Logger.hpp>
 #include "ChainNode.hpp"
 
-namespace datacarder {
+namespace bixit::abstract_chain {
 
     class NodeIf : public ChainNode {
     

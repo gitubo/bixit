@@ -11,7 +11,7 @@
 #include <iomanip>
 
 
-namespace datacarder {
+namespace bixit::bitstream {
     class BitStream {
     private:
         std::unique_ptr<uint8_t[]> buffer; 

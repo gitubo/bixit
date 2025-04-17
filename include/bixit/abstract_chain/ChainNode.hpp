@@ -1,14 +1,19 @@
 #pragma once
 
+#include <string>
+#include <variant>
+#include <optional>
 #include <nlohmann/json.hpp>
-#include "../bitstream/BitStream.hpp"
-#include "../logger/Logger.hpp"
+#include <bixit/bitstream/BitStream.hpp>
+#include <bixit/logger/Logger.hpp>
 #include "ChainNodeAttribute.hpp"
 #include "ChainAccess.hpp"
 #include "Helper.hpp"
 
+using Logger = bixit::logger::Logger;
+using BitStream = bixit::bitstream::BitStream;
 
-namespace bixit {
+namespace bixit::abstract_chain {
 
     class ChainNode {
 

@@ -6,11 +6,15 @@
 #include <unordered_map>
 #include <memory>
 #include <nlohmann/json.hpp>
-#include "../logger/Logger.hpp"
+#include <bixit/bitstream/BitStream.hpp>
+#include <bixit/logger/Logger.hpp>
+#include "ChainNode.hpp"
 #include "ChainAccess.hpp"
 
+using Logger = bixit::logger::Logger;
+using BitStream = bixit::bitstream::BitStream;
 
-namespace bixit {
+namespace bixit::abstract_chain {
 
     class Chain : public ChainAccess{
 

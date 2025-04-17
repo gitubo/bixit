@@ -1,6 +1,6 @@
-#include "datacarder/bitstream/BitStream.hpp"
+#include <bixit/bitstream/BitStream.hpp>
 
-using namespace datacarder;
+using namespace bixit::bitstream;
 
 BitStream::BitStream(const uint8_t* inputBuffer, size_t initialCapacityInBits)
     : capacity(initialCapacityInBits), offset(0) {

@@ -6,9 +6,12 @@
 #include <string>
 #include <optional>
 #include <typeinfo>
+#include <cstdint>
+#include <sstream>
+#include <unordered_map>
 
 
-namespace datacarder {
+namespace bixit::catalog {
     class SchemaElement {
 
     public:

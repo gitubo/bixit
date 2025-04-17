@@ -7,19 +7,23 @@
 #include <optional>
 #include <nlohmann/json.hpp>
 
-#include "../logger/Logger.hpp"
-#include "../abstract_chain/ChainFactory.hpp"
-#include "../abstract_chain/NodeRoot.hpp"
-#include "../abstract_chain/NodeDetour.hpp"
-#include "../abstract_chain/NodeRouter.hpp"
-#include "../abstract_chain/NodeArray.hpp"
-#include "../abstract_chain/NodeIf.hpp"
-#include "../abstract_chain/NodeFunctionLua.hpp"
-#include "../abstract_chain/NodeUnsignedInteger.hpp"
+#include <bixit/logger/Logger.hpp>
+#include <bixit/abstract_chain/ChainFactory.hpp>
+#include <bixit/abstract_chain/NodeRoot.hpp>
+#include <bixit/abstract_chain/NodeDetour.hpp>
+#include <bixit/abstract_chain/NodeRouter.hpp>
+#include <bixit/abstract_chain/NodeArray.hpp>
+#include <bixit/abstract_chain/NodeIf.hpp>
+#include <bixit/abstract_chain/NodeFunctionLua.hpp>
+#include <bixit/abstract_chain/NodeUnsignedInteger.hpp>
 
 #include "Schema.hpp"
 
-namespace datacarder {
+using ChainNode = bixit::abstract_chain::ChainNode;
+using ChainAccess = bixit::abstract_chain::ChainAccess;
+using ChainNodeAttribute = bixit::abstract_chain::ChainNodeAttribute;
+
+namespace bixit::catalog {
 
     class SchemaCatalog {
     private:
@@ -29,13 +33,6 @@ namespace datacarder {
     public:
 
         SchemaCatalog(const std::string&, const Logger::Level);
-        /*
-        static SchemaCatalog& getInstance(const std::string& proposedOriginDirectory = ".") {
-            static SchemaCatalog instance(proposedOriginDirectory); 
-            return instance;
-        }
-        */
-
         const std::shared_ptr<ChainNode> getAbstractChain(const std::string& key) const;
         const std::shared_ptr<ChainNode> parseSchemaOnTheFly(const nlohmann::json&);
         std::string to_string(size_t) const;
@@ -43,7 +40,6 @@ namespace datacarder {
     private:
         int parseSchema(const std::string&, const nlohmann::json&);
         const std::shared_ptr<Schema> parseSchema(const nlohmann::json&);
-        //SchemaCatalog& operator=(const SchemaCatalog&) = delete;
 
         std::optional<std::shared_ptr<ChainNode>> evalArray(const nlohmann::json&, const std::shared_ptr<ChainAccess>);
         std::optional<std::shared_ptr<ChainNode>> evalObject(const nlohmann::json&, const std::shared_ptr<ChainAccess>);

@@ -4,9 +4,11 @@
 #include <variant>
 #include <optional>
 #include <unordered_map>
+#include <memory>
 #include <vector>
+#include <sstream>
 
-namespace bixit {
+namespace bixit::abstract_chain {
 
 class ChainNodeAttribute {
 

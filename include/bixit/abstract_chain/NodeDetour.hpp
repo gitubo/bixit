@@ -1,8 +1,10 @@
 #pragma once
 
+#include <bixit/bitstream/BitStream.hpp>
 #include "ChainNode.hpp"
 
-namespace datacarder {
+
+namespace bixit::abstract_chain {
 
     class NodeDetour : public ChainNode {
     private:

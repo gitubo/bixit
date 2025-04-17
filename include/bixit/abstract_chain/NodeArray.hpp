@@ -2,7 +2,7 @@
 
 #include "ChainNode.hpp"
 
-namespace datacarder {
+namespace bixit::abstract_chain {
 
     class NodeArray : public ChainNode {
     private:

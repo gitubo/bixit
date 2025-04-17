@@ -4,7 +4,7 @@
 #include <fstream>
 #include <string>
 
-namespace bixit {
+namespace bixit::logger {
     class Logger {
 	 	public:
 			enum class Level {

@@ -6,10 +6,15 @@
 
 #include "SchemaElement.hpp"
 
-#include "../logger/Logger.hpp"
-#include "../abstract_chain/Chain.hpp"
+#include <bixit/logger/Logger.hpp>
+#include <bixit/abstract_chain/Chain.hpp>
+#include <bixit/abstract_chain/ChainNode.hpp>
 
-namespace datacarder {
+using Chain = bixit::abstract_chain::Chain;
+using ChainNode = bixit::abstract_chain::ChainNode;
+
+
+namespace bixit::catalog {
     class Schema {
     private:
         std::string catalogName;

@@ -1,6 +1,13 @@
-#include "datacarder/catalog/SchemaCatalog.hpp"
+#include <bixit/catalog/SchemaCatalog.hpp>
+
 
 namespace fs = std::filesystem;
+using namespace bixit::catalog;
+using namespace bixit::abstract_chain;
+
+using ChainNode = bixit::abstract_chain::ChainNode;
+using ChainAccess = bixit::abstract_chain::ChainAccess;
+using ChainNodeAttribute = bixit::abstract_chain::ChainNodeAttribute;
 
 std::unordered_map<std::string, std::string> listFilesRecursive(const fs::path& directory) {
     std::unordered_map<std::string, std::string> fileMap;
@@ -31,7 +38,6 @@ std::unordered_map<std::string, std::string> listFilesRecursive(const fs::path& 
     return fileMap;
 }
 
-using namespace datacarder;
 
 SchemaCatalog::SchemaCatalog(const std::string& originDirectory, const Logger::Level logLevel) {
     this->originDirectory = originDirectory;

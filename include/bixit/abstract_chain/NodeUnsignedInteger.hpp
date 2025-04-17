@@ -2,14 +2,16 @@
 
 #include "ChainNode.hpp"
 
-namespace datacarder {
+using Endianess = bixit::abstract_chain::Endianness;
+
+namespace bixit::abstract_chain {
     class NodeUnsignedInteger : public ChainNode {
 
     public:
 
     private:
         size_t bitLength = 0;
-        chain_utils::Endianness endianness = chain_utils::Endianness::BIG;
+        Endianness endianness = Endianness::BIG;
 
     public:
         NodeUnsignedInteger() : ChainNode() {}
@@ -33,11 +35,11 @@ namespace datacarder {
                 } else {
                     auto endianess_str = attribute.getString().value();
                     if(endianess_str.compare("big")){
-                        endianness = chain_utils::Endianness::BIG;
+                        endianness = Endianness::BIG;
                     } else if(endianess_str.compare("little")){
-                        endianness = chain_utils::Endianness::LITTLE;
+                        endianness = Endianness::LITTLE;
                     } else {
-                        endianness = chain_utils::Endianness::BIG;
+                        endianness = Endianness::BIG;
                         Logger::getInstance().error("Attribute <endianness> is not valid ("+endianess_str+")");
                         Logger::getInstance().warning("Attribute <endianness> forced to 'BIG'");
                     }
@@ -49,7 +51,7 @@ namespace datacarder {
             uint64_t value = 0;            
             int convertion_error = 0;
             try{
-                convertion_error = chain_utils::convert_from_uint8_array_to_uint64(
+                convertion_error = bixit::abstract_chain::convert_from_uint8_array_to_uint64(
                     bitStream.consume(bitLength).get(),
                     bitLength,
                     endianness,
@@ -88,13 +90,13 @@ namespace datacarder {
             uint64_t rawValue = inputJson[this->getFullName()];
             uint64_t value = 0;
             switch (endianness){
-                case chain_utils::Endianness::BIG:
+                case Endianness::BIG:
                     value = rawValue;
 /*                     for (int i = 0; i < sizeof(uint64_t); ++i) {
                         value |= ((rawValue >> (i * 8)) & 0xFF) << ((7 - i) * 8);
                     }
  */                    break;
-                case chain_utils::Endianness::LITTLE:
+                case Endianness::LITTLE:
                     // No convertion needed
                     value = rawValue;
                     break;

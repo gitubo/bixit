@@ -2,7 +2,7 @@
 
 #include <memory>
 
-namespace bixit {
+namespace bixit::abstract_chain {
 
     class ChainNode;
 
