@@ -4,7 +4,7 @@
 #include <fstream>
 #include <string>
 
-namespace datacarder {
+namespace bixit {
     class Logger {
 	 	public:
 			enum class Level {
