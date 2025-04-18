@@ -58,7 +58,7 @@ The final result will be a (de)serialiser able to manage a CAN message like this
 ```
 000000010100000001000000001000000110100001100000001011111111
 ```
-into a JSON like that:
+into a JSON like this:
 ```json
 {
    "start_of_frame": 0,
