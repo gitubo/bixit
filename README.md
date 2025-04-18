@@ -123,4 +123,25 @@ Here an extraction of the format configuration file (JSON):
 },
 [...]
 ```
+## Interface Overview
+
+Bixit exposes a simple yet powerful interface that supports both decoding and encoding operations.
+
+You can:
+
+- **Decode** a message by passing:
+  - A binary stream (as a **Base64** string)
+  - The **message type identifier** (used to select the correct decoding schema from the catalog)
+
+- **Encode** a message by passing:
+  - A **JSON object** with the field values (as a string)
+  - The **message type identifier**
+
+In both directions, Bixit automatically selects the correct configuration based on the message type.
+
+Alternatively, for testing or special use cases, you can directly provide the **configuration file** inline with the request—useful for:
+- Validating a schema during development
+- Encoding or decoding messages using formats that are not part of the current catalog
+
+This flexibility makes Bixit ideal for rapid prototyping, testing and debugging workflows.
 
