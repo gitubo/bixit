@@ -139,6 +139,11 @@ You can:
 
 In both directions, Bixit automatically selects the correct configuration based on the message type.
 
+## License
+
+This project is licensed under the **GNU Lesser General Public License v3.0**.  
+See the [LICENSE](./LICENSE) file for more information.
+
 Alternatively, for testing or special use cases, you can directly provide the **configuration file** inline with the request—useful for:
 - Validating a schema during development
 - Encoding or decoding messages using formats that are not part of the current catalog
