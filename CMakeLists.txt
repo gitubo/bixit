@@ -38,5 +38,5 @@ set_target_properties(bixit PROPERTIES OUTPUT_NAME "bixit")
 
 if(BUILD_TESTING)
     enable_testing()
-    add_subdirectory(test)
+    add_subdirectory(examples)
 endif()
