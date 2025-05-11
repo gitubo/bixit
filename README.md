@@ -1,8 +1,37 @@
 # Bixit
-**Bixit** is a configurable binary message dissector. Its goal is to convert the content of a binary message into easy-to-read JSON and back by providing a highly configurable and fast (de)serialization engine designed to handle even the most demanding use cases, including bit-level precision, non-byte-aligned data, complex structures and conditional decoding logic.
+
+[![License: LGPL v3](https://img.shields.io/badge/License-LGPL_v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)
+
+**Bixit** is a powerful and configurable binary message dissector designed to convert binary messages into easy-to-read JSON and back. It offers a highly configurable and fast (de)serialization engine designed to handle even the most demanding use cases, including bit-level precision, non-byte-aligned data, complex structures and conditional decoding logic.
+
+**Why Use Bixit?**
+
+* **Wide Applicability:** Ideal for IoT, embedded systems, automotive, aerospace, railway and gateways.
+* **Zero Compromise:** Define complex binary formats with bit-level precision.
+* **No Need to Code:** Configure (de)serialization via text files, no coding required.
+* **Maximum Flexibility:** Modular architecture for future expansions via Lua scripting.
+* **High Performance:** Fast and efficient (de)serialization engine.
+* **Easy Integration:** Lightweight and linkable C++ shared library.
+* **Multi-Format Management:** Organize and manage multiple formats and versions in a structured catalog.
+
+## Getting Started
+
+1.  **Installation:** Bixit uses CMake as its build system. To build and install the library, follow the standard CMake workflow:
+
+    ```bash
+    mkdir build
+    cd build
+    cmake ..
+    make -j$(nproc)
+    ```
+
+    After these steps, the `libbixit.so` library will be installed on your system and ready to be linked with your projects.
+
+2.  **Format Definition:** Create a configuration file (JSON) that describes the structure of your binary message.
+3.  **Usage:** Integrate the library into your C++ code and use its API to encode/decode messages by passing the binary stream/JSON and the format identifier.
 
 ## Using Bixit: When and Why
-Use Bixit whenever your application needs to interpret structured binary data with precision and flexibility. Designed as a modular message dissector, Bixit can be embedded directly into your software to parse, decode, and transform raw binary messages—such as protocol frames or sensor data—into structured, readable JSON format. It’s especially useful in IoT and embedded systems, where efficient handling of compact binary protocols is critical. In automotive, aerospace and railway domains, Bixit simplifies the interpretation of complex formats like CAN, LIN, or ETCS related. And in gateway scenarios, it bridges binary and web-friendly formats, making integration with cloud services and APIs seamless, without the need for writing custom parsers from scratch.
+Use Bixit whenever your application needs to interpret structured binary data with precision and flexibility. Designed as a modular message dissector, Bixit can be embedded directly into your software to parse, decode, and transform raw binary messages—such as protocol frames or sensor data—into structured, readable JSON format. It’s especially useful in IoT and embedded systems, where efficient handling of compact binary protocols is critical. In automotive, aerospace, and railway domains, Bixit simplifies the interpretation of complex formats like CAN, LIN, or ETCS related. And in gateway scenarios, it bridges binary and web-friendly formats, making integration with cloud services and APIs seamless, without the need for writing custom parsers from scratch.
 
 ## Genesis of Bixit
 Bixit was born out of real-world challenges encountered in the **railway industry**, where a multitude of actors exchange a wide variety of binary messages each with its own complex format.
@@ -13,7 +42,7 @@ Bixit was created to solve exactly this problem: a **fast, deeply configurable**
 ## More details
 
 Bixit is a dissector that transforms a generic binary message into its JSON equivalent (and back), based on a configuration file that describes the message format to its internal engine.  
-No code to write. No recompilation. No complex logic to manage.
+**No code to write. No recompilation. No complex logic to manage.**
 
 The plain-text configuration file is used in both directions, from binary to JSON and from JSON back to binary.  
 Bixit supports multiple format at the same time, which can be neatly organized in a structured catalog. This allows seamless management of multiple formats and even different versions of the same format.
@@ -145,9 +174,12 @@ Alternatively, for testing or special use cases, you can directly provide the **
 
 This flexibility makes Bixit ideal for rapid prototyping, testing and debugging workflows.
 
-
 ## License
 
 This project is licensed under the **GNU Lesser General Public License v3.0**.  
 See the [LICENSE](./LICENSE) file for more information.
 
+## Get Involved!
+- Try Bixit and let us know what you think!
+- Report bugs or suggest new features by opening an issue on GitHub.
+- Contribute configuration examples for other binary formats.
