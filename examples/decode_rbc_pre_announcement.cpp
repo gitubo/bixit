@@ -21,7 +21,7 @@ int main(int argc, char* argv[])
             std::cerr << "[Error]: bitstream_to_json returned code " << std::to_string(retval)<< std::endl;
             return 2;
         }
-        std::cout << json.dump() << std::endl;
+        std::cout << json.unflatten().dump(2) << std::endl;
 
     }
     catch (const nlohmann::json::parse_error& e)
