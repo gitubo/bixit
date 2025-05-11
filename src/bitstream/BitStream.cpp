@@ -2,6 +2,8 @@
 
 using namespace bixit::bitstream;
 
+BitStream::BitStream() : capacity(0), offset(0), buffer(nullptr) {};
+
 BitStream::BitStream(const uint8_t* inputBuffer, size_t initialCapacityInBits)
     : capacity(initialCapacityInBits), offset(0) {
 
@@ -10,6 +12,7 @@ BitStream::BitStream(const uint8_t* inputBuffer, size_t initialCapacityInBits)
      * Here a couple of examples:
      * 
      * The input is an integer (20) defined by 11 valid bits
+     *
      * int 20 => .....000 00010100
      * (bytes)   [   1  ] [   0  ]
      * Converted BitStream
@@ -31,9 +34,13 @@ BitStream::BitStream(const uint8_t* inputBuffer, size_t initialCapacityInBits)
 
     size_t byteCapacity = (capacity + 7) / 8;
     buffer = std::make_unique<uint8_t[]>(byteCapacity);
+    std::memset(buffer.get(), 0, byteCapacity);
+
     size_t bitShiftAmount = capacity % 8;
 
     if(bitShiftAmount == 0){
+        // The current buffer is 8-bit aligned
+        // We just need to copy the content
         memcpy(buffer.get(), inputBuffer, byteCapacity);
     } else {
         // Circular Right Shift to align to the BitStream approach
@@ -63,7 +70,105 @@ BitStream::BitStream(const std::string& base64_str) : offset(0) {
     capacity = lengthInBytes * 8;
 }
 
-void BitStream::copyBits(uint8_t* dest, size_t destBitOffset, const uint8_t* src, size_t srcBitOffset, size_t length) const {
+BitStream::BitStream(const std::string& base64_str, const size_t real_capacity) 
+    : BitStream(base64_str) {
+    if (real_capacity > 0 && real_capacity < capacity) {
+        capacity = real_capacity;
+    }
+}
+
+// Implementazione del metodo BitStream::copyBits
+void BitStream::copyBits(
+    uint8_t* dest,             // Puntatore al buffer di destinazione
+    const size_t destBitOffset,  // Offset in bit nel buffer di destinazione da cui iniziare a scrivere
+    const uint8_t* src,          // Puntatore al buffer sorgente
+    const size_t srcBitOffset,   // Offset in bit nel buffer sorgente da cui iniziare a leggere
+    const size_t length          // Numero di bit da copiare
+) const {
+
+    int fromByte = 7 - srcBitOffset/8;
+    int toByte = 7 - (srcBitOffset+length)/8;
+    
+    int fromBit = 7-srcBitOffset%8;  
+    int toBit = (srcBitOffset+length)%8; 
+
+    size_t bit_index=0;
+    for(int byte=fromByte; byte > toByte; --byte) {
+        int maxBit=7, minBit=0;
+        if(byte==fromByte) maxBit=fromBit;
+        if(byte==toByte+1) minBit=toBit;
+        for(int bit=maxBit; bit >= minBit; --bit) {
+            uint8_t bit_value = (src[byte] >> bit) & 1U;
+            size_t absolute_dest_bit_index = destBitOffset + bit_index++;
+            size_t dest_byte_index = absolute_dest_bit_index / 8;
+            uint8_t dest_bit_pos_in_byte = 7 - (absolute_dest_bit_index % 8);
+            if (bit_value) {
+                dest[dest_byte_index] |= (1U << dest_bit_pos_in_byte);
+            } else {
+                dest[dest_byte_index] &= ~(1U << dest_bit_pos_in_byte);
+            }
+        }
+    }
+
+}
+/*
+void BitStream::copyBits(
+    uint8_t* dest, 
+    const size_t destBitOffset, 
+    const uint8_t* src, 
+    const size_t srcBitOffset, 
+    const size_t length
+) const {
+    if(length==32){
+        std::cout << "A"<< std::endl;
+    }
+    for (size_t i = 0; i < length; ++i) {
+        size_t srcByteIndex = (srcBitOffset + i) / 8;
+        size_t srcBitIndex = 7 - ((srcBitOffset + i) % 8);
+
+        bool bit = (src[srcByteIndex] >> srcBitIndex) & 1;
+
+        size_t destByteIndex = (destBitOffset + i) / 8;
+        size_t destBitIndex = 7 - ((destBitOffset + i) % 8);
+
+        if (bit) {
+            dest[destByteIndex] |= (1 << destBitIndex);
+        } else {
+            dest[destByteIndex] &= ~(1 << destBitIndex);
+        }
+    }
+}
+    */
+
+void BitStream::set(const uint8_t* inputBuffer, size_t inputBitLength) {
+    if (!inputBuffer || inputBitLength == 0) {
+        throw std::invalid_argument("BitStream::set - Input data is invalid or empty");
+    }
+    capacity = inputBitLength;
+    size_t byteCapacity = (capacity + 7) >> 3;            
+    buffer = std::make_unique<uint8_t[]>(byteCapacity);
+    std::memcpy(buffer.get(), inputBuffer, byteCapacity);
+    offset = 0;
+}
+
+/*
+void BitStream::reduceCapacity(const size_t newCapacity) {
+    if(newCapacity>=capacity){
+        return;
+    }
+    size_t byteCapacity = (capacity + 7) / 8;
+    size_t newByteCapacity = (newCapacity + 7) / 8;
+    std::unique_ptr<uint8_t[]> tempBuffer = std::make_unique<uint8_t[]>(newByteCapacity);
+    int byteIndex = byteCapacity-1;
+    for(int newByteIndex = newByteCapacity-1; newByteIndex>=0; newByteIndex--){
+        tempBuffer[newByteIndex] = buffer[byteIndex--];
+    }
+    buffer = std::move(tempBuffer);
+    capacity=newCapacity;
+}
+*/
+
+void BitStream::copyBitsRead(uint8_t* dest, size_t destBitOffset, const uint8_t* src, size_t srcBitOffset, size_t length) const {
     for (size_t i = 0; i < length; ++i) {
         size_t srcByteIndex = (srcBitOffset + i) / 8;
         size_t srcBitIndex = 7 - ((srcBitOffset + i) % 8);
@@ -81,32 +186,6 @@ void BitStream::copyBits(uint8_t* dest, size_t destBitOffset, const uint8_t* src
     }
 }
 
-void BitStream::set(const uint8_t* inputBuffer, size_t inputBitLength) {
-    if (!inputBuffer || inputBitLength == 0) {
-        throw std::invalid_argument("BitStream::set - Input data is invalid or empty");
-    }
-    capacity = inputBitLength;
-    size_t byteCapacity = (capacity + 7) >> 3;            
-    buffer = std::make_unique<uint8_t[]>(byteCapacity);
-    std::memcpy(buffer.get(), inputBuffer, byteCapacity);
-    offset = 0;
-}
-
-void BitStream::reduceCapacity(const size_t newCapacity) {
-    if(newCapacity>=capacity){
-        return;
-    }
-    size_t byteCapacity = (capacity + 7) / 8;
-    size_t newByteCapacity = (newCapacity + 7) / 8;
-    std::unique_ptr<uint8_t[]> tempBuffer = std::make_unique<uint8_t[]>(newByteCapacity);
-    int byteIndex = byteCapacity-1;
-    for(int newByteIndex = newByteCapacity-1; newByteIndex>=0; newByteIndex--){
-        tempBuffer[newByteIndex] = buffer[byteIndex--];
-    }
-    buffer = std::move(tempBuffer);
-    capacity=newCapacity;
-}
-        
 std::unique_ptr<uint8_t[]> BitStream::read(size_t length) const {
     if (offset + length > capacity) {
         throw std::out_of_range("BitStream: you are trying to read beyond the end of the bit stream (offset + length > capacity)");
@@ -115,7 +194,7 @@ std::unique_ptr<uint8_t[]> BitStream::read(size_t length) const {
     size_t byteLength = (length + 7) >> 3;
     auto result = std::make_unique<uint8_t[]>(byteLength);
     std::fill(result.get(), result.get() + byteLength, 0);
-    copyBits(result.get(), 0, buffer.get(), offset, length);
+    copyBitsRead(result.get(), 0, buffer.get(), offset, length);
     
     return result; 
 }
@@ -128,6 +207,7 @@ std::unique_ptr<uint8_t[]> BitStream::consume(size_t length) {
     offset += length;
     return result;
 }
+
 
 void BitStream::append(const BitStream& other) {
     size_t newCapacity = capacity + other.capacity;
@@ -144,6 +224,29 @@ void BitStream::append(const BitStream& other) {
     capacity = newCapacity; 
 }
 
+
+void BitStream::append(const uint8_t* bufferToAppend, const size_t bufferToAppendCapacityInBit, const size_t bufferToAppendSizeInByte) {
+    if(bufferToAppendSizeInByte * 8 < bufferToAppendCapacityInBit){
+        return; // Capacity exceeds the max amunt of bits
+    }
+    size_t newCapacity = capacity + bufferToAppendCapacityInBit;
+    size_t newByteCapacity = (newCapacity + 7) / 8;
+
+    std::unique_ptr<uint8_t[]> newBuffer = std::make_unique<uint8_t[]>(newByteCapacity);
+    std::fill(newBuffer.get(), newBuffer.get() + newByteCapacity, 0);
+
+    size_t currentByteCapacity = (capacity + 7) / 8;
+    std::memcpy(newBuffer.get(), buffer.get(), currentByteCapacity);
+    
+    const size_t bufferToAppendStartFrom = bufferToAppendSizeInByte * 8 - bufferToAppendCapacityInBit;
+    copyBits(newBuffer.get(), capacity, bufferToAppend, bufferToAppendStartFrom, bufferToAppendCapacityInBit);
+
+    buffer = std::move(newBuffer);
+    capacity = newCapacity; 
+}
+
+
+/*
 int BitStream::shift(const size_t shiftAmount, const bool shiftRight) {
     if (shiftAmount == 0 || capacity == 0){
         return 1;
@@ -161,24 +264,8 @@ int BitStream::shift(const size_t shiftAmount, const bool shiftRight) {
 
     if (shiftRight) {
         // Right Shift
-/* TBD */
-/*
-        size_t shiftByte = (shiftAmount+7) / 8;
-        size_t shiftBit  = shiftAmount % 8;
+// 
 
-        for(int byteIndex = capacityInBytes-1; byteIndex>=0; byteIndex--){
-
-            if(byteIndex+shiftByte > capacityInBytes) continue;
-
-            uint16_t aux16 = buffer[byteIndex];
-            aux16 <<= shiftBit;
-            uint8_t carry = (aux16 >> 8) & 0xFF;
-            uint8_t value = aux16 & 0xFF;
-
-            tempBuffer[byteIndex+shiftByte] |= carry;
-            tempBuffer[byteIndex+shiftByte-1] = value;
-        }
-*/
     } else {
         // Left Shift
         size_t shiftByte = (shiftAmount+7) / 8;
@@ -200,6 +287,7 @@ int BitStream::shift(const size_t shiftAmount, const bool shiftRight) {
     std::memcpy(buffer.get(), tempBuffer.get(), capacityInBytes); 
     return 0;
 }
+    */
 
 std::string BitStream::to_string() const {
     return to_string(buffer, capacity);
@@ -220,23 +308,10 @@ std::string BitStream::to_string(const std::unique_ptr<uint8_t[]>& stream, size_
     }
     return oss.str();
 }
-/*
-std::string BitStream::to_string(const std::unique_ptr<uint8_t[]>& stream, size_t lengthInBits) {
-    std::ostringstream oss;
-    int lengthInBytes = (lengthInBits + 7) / 8;
-    int bitsInLastByte = 8-(lengthInBits % 8);
-    int minBit = 0;
-    for(int index=0; index < lengthInBytes; index++){
-        if(index==lengthInBytes-1){
-            minBit = bitsInLastByte;
-        }
-        for (int bit = 7; bit >= minBit; bit--) {
-            oss << ((stream[index] >> bit) & 1);
-        }
-    }
-    return oss.str();
-}
-*/
+
+std::string BitStream::to_base64() const { 
+    return base64_encode(this->buffer.get(), (this->capacity + 7) / 8);
+};
 
 size_t BitStream::base64_decode(const std::string& encoded_string, std::unique_ptr<uint8_t[]>& decoded_data) {
     size_t input_length = encoded_string.length();

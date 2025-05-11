@@ -55,6 +55,10 @@ namespace bixit::abstract_chain {
                             Logger::getInstance().error("Each object in <routing_table> must contain <value> key");                           
                             return;
                         }
+                        if (!_value->second.isInteger()) {
+                            Logger::getInstance().error("Key <value> in <routing_table> must be an integer");                           
+                            return;
+                        }
                         const auto _node_id = routeDefinition.find("node_id");
                         if (_node_id == routeDefinition.end()) {
                             Logger::getInstance().warning("The provided object in <routing_table> does not contain <node_id> key");                           
@@ -65,6 +69,7 @@ namespace bixit::abstract_chain {
                     std::sort(_routes.begin(), _routes.end(), [](const Route& a, const Route& b) {
                         return a.id < b.id;
                     });
+
                     for (const auto& route : _routes) {
                         routingTable[route.value] = route.node_id;
                     }
@@ -119,7 +124,6 @@ namespace bixit::abstract_chain {
                 return 2;
             }
             int routingValue = jsonControlNode.get<int>();
-            
             // Address the dissector to the right route
             auto it = routingTable.find(routingValue);
             if (it != routingTable.end()) {

@@ -12,19 +12,21 @@
 
 
 namespace bixit::bitstream {
+    
     class BitStream {
     private:
         std::unique_ptr<uint8_t[]> buffer; 
         size_t capacity;                   
         size_t offset;                     
 
-        void copyBits(uint8_t*, size_t, const uint8_t*, size_t, size_t) const;
-
+        void copyBits(uint8_t*, const size_t, const uint8_t*, const size_t, const size_t) const;
+        void copyBitsRead(uint8_t*, size_t, const uint8_t*, size_t, size_t) const;
     public:
 
-        BitStream() : capacity(0), offset(0), buffer(nullptr) {}
+        BitStream();
         BitStream(const uint8_t*, size_t);
         BitStream(const std::string&);
+        BitStream(const std::string&, const size_t);
 
         void set(const uint8_t*, size_t);
 
@@ -33,17 +35,16 @@ namespace bixit::bitstream {
         std::unique_ptr<uint8_t[]> consume(size_t);
 
         void append(const BitStream&);
+        void append(const uint8_t*, const size_t, const size_t);
 
-        int shift(const size_t, const bool);
+        //int shift(const size_t, const bool);
 
         std::string to_string() const;
 
-        std::string to_base64() const { 
-            return base64_encode(this->buffer.get(), (this->capacity + 7) / 8);
-        };
+        std::string to_base64() const;
 
         size_t getCapacity() const { return capacity; }
-        void reduceCapacity(const size_t);
+//        void reduceCapacity(const size_t);
         size_t getOffset() const { return offset;}
         
     private:

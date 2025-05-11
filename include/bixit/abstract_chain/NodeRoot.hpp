@@ -12,7 +12,6 @@ namespace bixit::abstract_chain {
         void addAttribute(const std::string& key, const ChainNodeAttribute& attribute) override {}
         
         int bitstream_to_json(BitStream& bitStream, nlohmann::ordered_json& outputJson) const override {
-            
             // Propagate to the next node (if any)
             auto nextNode = getNextNode();
             if(nextNode){

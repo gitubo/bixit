@@ -22,25 +22,38 @@ namespace bixit::abstract_chain {
         std::unordered_map<std::string, std::shared_ptr<ChainNode>> chain;
         std::shared_ptr<ChainNode> startingNode;
 
+        // Helper function to perform deep copy of ChainNode
+        std::shared_ptr<ChainNode> cloneNode(const std::shared_ptr<ChainNode>& node) const {
+            if (!node) return nullptr;
+            std::shared_ptr<ChainNode> newNode = node->clone(); // Usa il metodo clone di ChainNode
+            return newNode;
+        }
+        
     public:
 
         Chain() = default;
-        Chain(const Chain& other){
-            for(auto it = other.chain.begin(); it != other.chain.end(); ++it){
-                chain[it->first] = it->second;
-            }     
+
+        Chain(const Chain& other) {
+            for (const auto& [nodeId, node] : other.chain) {
+                chain[nodeId] = cloneNode(node); // Usa la funzione helper cloneNode
+            }
+            startingNode = cloneNode(other.startingNode);
         }
+
         Chain& operator=(const Chain& other) {
             if (this != &other) {
                 chain.clear();
-                for(auto it = other.chain.begin(); it != other.chain.end(); ++it){
-                    chain[it->first] = it->second;
+                for (const auto& [nodeId, node] : other.chain) {
+                    chain[nodeId] = cloneNode(node); // Usa cloneNode
                 }
+                startingNode = cloneNode(other.startingNode);
             }
             return *this;
         }
 
-        std::unique_ptr<Chain> clone() const { return std::make_unique<Chain>(*this); };
+        std::unique_ptr<Chain> clone() const {
+            return std::make_unique<Chain>(*this);
+        }
 
         void addNode(const std::string& nodeId, std::shared_ptr<ChainNode> node) {
             std::pair<std::string, std::shared_ptr<ChainNode>> thisPair(nodeId, node);         
@@ -78,7 +91,6 @@ namespace bixit::abstract_chain {
             } else {
                 Logger::getInstance().error("No root node <main>");
             }
-            std::cout << "Exiting bitstream_to_json" << std::endl;
             return 1;
         };
 

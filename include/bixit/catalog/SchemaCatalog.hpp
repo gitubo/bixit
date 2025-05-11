@@ -22,13 +22,14 @@
 using ChainNode = bixit::abstract_chain::ChainNode;
 using ChainAccess = bixit::abstract_chain::ChainAccess;
 using ChainNodeAttribute = bixit::abstract_chain::ChainNodeAttribute;
+using Logger = bixit::logger::Logger;
 
 namespace bixit::catalog {
 
     class SchemaCatalog {
     private:
-        std::unordered_map<std::string, Schema> schemaMap;
         std::string originDirectory;
+        std::unordered_map<std::string, std::shared_ptr<Schema>> schemaMap;
 
     public:
 
@@ -44,6 +45,9 @@ namespace bixit::catalog {
         std::optional<std::shared_ptr<ChainNode>> evalArray(const nlohmann::json&, const std::shared_ptr<ChainAccess>);
         std::optional<std::shared_ptr<ChainNode>> evalObject(const nlohmann::json&, const std::shared_ptr<ChainAccess>);
         std::optional<std::shared_ptr<ChainNodeAttribute>> evalAttribute(const nlohmann::json&);
+
+        std::unordered_map<std::string, std::string> listFilesRecursive(const std::filesystem::path&);
+
     };
 
 }

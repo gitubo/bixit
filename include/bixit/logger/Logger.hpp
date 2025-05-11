@@ -5,6 +5,7 @@
 #include <string>
 
 namespace bixit::logger {
+	
     class Logger {
 	 	public:
 			enum class Level {

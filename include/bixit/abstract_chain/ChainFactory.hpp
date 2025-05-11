@@ -27,7 +27,7 @@ namespace bixit::abstract_chain {
             if (creators.find(className) != creators.end()) {
                 return creators[className]();
             }
-            Logger::getInstance().log("Failed to create class for classname <" + className + ">", Logger::Level::ERROR);
+            Logger::getInstance().error("Failed to create class for classname <" + className + ">");
             return nullptr;
             
         }

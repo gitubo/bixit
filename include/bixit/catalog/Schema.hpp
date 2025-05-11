@@ -12,7 +12,7 @@
 
 using Chain = bixit::abstract_chain::Chain;
 using ChainNode = bixit::abstract_chain::ChainNode;
-
+using Logger = bixit::logger::Logger;
 
 namespace bixit::catalog {
     class Schema {

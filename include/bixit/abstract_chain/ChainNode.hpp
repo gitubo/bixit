@@ -102,7 +102,10 @@ namespace bixit::abstract_chain {
 
         virtual std::shared_ptr<ChainNode> getNextNode() const {
             if(!this->nextNode.empty() && this->nextNode!=""){
-                return this->Chain->getNode(this->nextNode);
+                if (Chain) {
+                    return Chain->getNode(nextNode);
+                }
+                return nullptr;
             }
             return nullptr; 
         };
@@ -126,7 +129,7 @@ namespace bixit::abstract_chain {
             return 0; 
         };
 
-        virtual std::string to_string(size_t indent = 0) const { 
+        const std::string to_string(size_t indent = 0) const { 
             std::ostringstream oss;
             std::string indentStr(indent, ' ');
             oss << indentStr << "{\n"; 

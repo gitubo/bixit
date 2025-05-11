@@ -105,7 +105,7 @@ namespace bixit::abstract_chain {
                     return false;
                 }
                 
-                if(op=="NOT"){
+                if(op=="not"){
                     if (std::holds_alternative<bool>(lvalue)) {
                         const auto val = std::get<bool>(lvalue);
                         return val ? false : true;

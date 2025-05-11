@@ -26,7 +26,7 @@ Bixit is built around a **modular architecture**, making it easy to extend and e
 - Dynamic format selection  
 - Interfacing hooks  
 - Decoding flow control  
-- A rich set of base types and logical constructs
+- A rich set of logical constructs
 
 ### Supported Base Types
 
@@ -139,7 +139,7 @@ You can:
 
 In both directions, Bixit automatically selects the correct configuration based on the message type.
 
-Alternatively, for testing or special use cases, you can directly provide the **configuration file** inline with the request—useful for:
+Alternatively, for testing or special use cases, you can directly provide the **configuration file** inline with the request — useful for:
 - Validating a schema during development
 - Encoding or decoding messages using formats that are not part of the current catalog
 

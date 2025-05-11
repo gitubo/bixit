@@ -6,8 +6,16 @@ namespace bixit::abstract_chain {
 
     class NodeArray : public ChainNode {
     private:
-        bool is_array_size_fixed;
-        size_t repetitions;
+        /*
+         *  The array can be defined in two ways:
+         *  1. Fixed size (is_array_size_fixed = true) -> repetitions = <size_t>
+         *     If the repetitions is equal to 0 -> the content of the array is repeated until the end of the bitstream
+         *  2. Dynamic size (is_array_size_fixed = false) -> repetition_reference = <string>
+         *     The repetition_reference is a key in the json object that defines the repetition number of the array
+         */
+        // If the size of the array is fixed or not (true -> repetitions, false = dynamic)
+        bool is_array_size_fixed; 
+        size_t repetitions;  // Repetitions of the array (0 = until the end of the bitstream)
         std::string repetition_reference;
         bool is_absolute_reference;
         bool is_flatten;
@@ -25,7 +33,7 @@ namespace bixit::abstract_chain {
             is_array_size_fixed(true),
             is_flatten(false),
             repetitions(0),
-            repetition_reference(" = "),
+            repetition_reference(),
             is_absolute_reference(true),
             arrayNodeId("") {}
 
@@ -57,7 +65,7 @@ namespace bixit::abstract_chain {
                 if(attribute.isInteger()) {
                     repetitions = attribute.getInteger().value();
                     is_array_size_fixed = true;
-                    repetition_reference = " = ";
+                    repetition_reference = "";
                     is_absolute_reference = false;
                 } else if(attribute.isString()){
                     repetitions = 0;
@@ -65,6 +73,12 @@ namespace bixit::abstract_chain {
                     repetition_reference = attribute.getString().value();
                 } else {
                     Logger::getInstance().log("Attribute <repetitions> is not a string or an integer", Logger::Level::ERROR);
+                }
+            } else if(key=="mode"){
+                if(!attribute.isString()){
+                    Logger::getInstance().error("Attribute <mode> is not a string");
+                } else {
+                    arrayNodeId = attribute.getString().value();
                 }
             } else if(key=="is_absolute_reference"){
                 if(!attribute.isBool()){
@@ -130,9 +144,12 @@ namespace bixit::abstract_chain {
 
                 std::string array_basename = std::string(this->getFullName()) + std::string("/"); 
                 
-                for(size_t repetition = 0; repetition < actual_repetitions; repetition++){
+                size_t repetition = 0;
+                while(
+                    repetition < actual_repetitions || 
+                    (actual_repetitions == 0 && bitStream.getOffset() < bitStream.getCapacity()) 
+                ){
                     std::string array_key = array_basename + std::to_string(repetition);
-                    // Evaluate the item
                     nlohmann::ordered_json innerJson, innerJsonModified;
                     arrayNode->bitstream_to_json(bitStream, innerJson);
                     for (auto& [key, value] : innerJson.items()) {
@@ -143,6 +160,7 @@ namespace bixit::abstract_chain {
                         }
                     }
                     outputJson.update(innerJsonModified);
+                    repetition++;
                 }
             } else {
                 Logger::getInstance().warning("Array with id <" + this->getId() + "> is missing the array node");
@@ -226,8 +244,51 @@ namespace bixit::abstract_chain {
                     actual_repetitions = value.get<int>();
                 }
 
+                int index = 0;
+                while (true) {
+                    nlohmann::ordered_json subJson;
+                    bool found = false;
+                    if (!is_flatten) {
+                        std::string arrayPrefix = this->getFullName() + "/" + std::to_string(index);
+                        for (auto it = inputJson.begin(); it != inputJson.end(); ++it) {
+                            if (it.key().find(arrayPrefix) == 0) {
+                                std::string newKey = it.key().substr(arrayPrefix.size());
+                                subJson[newKey] = it.value();
+                                found = true;
+                            }
+                        }
+                    } else {
+                        std::string searchStr = "/" + std::to_string(index);
+                        for (auto it = inputJson.begin(); it != inputJson.end(); ++it) {
+                            std::string key = it.key();
+                            size_t pos = key.rfind(searchStr);
+                            if (pos != std::string::npos && pos > 0) {
+                                std::string newKey = key.substr(0, pos);
+                                subJson[newKey] = it.value();
+                                found = true;
+                            }
+                        }
+                    }
+
+                    if (!found) {
+                        break; // Esci dal ciclo se non sono stati trovati elementi per l'indice corrente
+                    }
+
+                    if (subJson.is_object()) {
+                        arrayNode->json_to_bitstream(subJson, bitStream);
+                    }
+
+                    index++;
+                    if (actual_repetitions > 0 && index >= actual_repetitions) {
+                        break;
+                    }
+                }
+                /*
                 unsigned int index = 0;
-                while( index < actual_repetitions ){
+                while( 
+                    index < actual_repetitions ||
+                    (actual_repetitions == 0 && bitStream.getOffset() < bitStream.getCapacity())
+                ){
                     nlohmann::ordered_json subJson;
                     if(!is_flatten){
                         std::string arrayPrefix = this->getFullName() + "/" + std::to_string(index);
@@ -253,27 +314,8 @@ namespace bixit::abstract_chain {
                     }
                     index++;
                 }
-                /*
-                if(!inputJson.contains(this->getFullName()+"/0")){
-                    Logger::getInstance().error("Key <"+this->getFullName()+"/0"+"> not found in the provided json object or the related value is not an array");
-                    return 100;      
-                }
-
-                int current_repetitions = 0;
-                for (auto& [key, val] : inputJson.items()){
-                    if(key.rfind(this->getFullName(), 0) == 0){
-                        current_repetitions++;
-                    }
-                }
-                int index = 0;
-                for(size_t repetition = 0; repetition < current_repetitions; repetition++){
-                    auto localArrayNode = arrayNode;
-                    localArrayNode->setName(std::to_string(index));
-                    localArrayNode->setParentName(this->getFullName());
-                    localArrayNode->json_to_bitstream(inputJson, bitStream);
-                    index++;
-                }
                 */
+
             } else {
                 Logger::getInstance().warning("Array with id <" + this->getId() + "> is missing the array node");
             }

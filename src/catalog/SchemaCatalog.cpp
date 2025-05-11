@@ -1,26 +1,30 @@
 #include <bixit/catalog/SchemaCatalog.hpp>
 
 
-namespace fs = std::filesystem;
 using namespace bixit::catalog;
 using namespace bixit::abstract_chain;
 
 using ChainNode = bixit::abstract_chain::ChainNode;
 using ChainAccess = bixit::abstract_chain::ChainAccess;
 using ChainNodeAttribute = bixit::abstract_chain::ChainNodeAttribute;
+using Logger = bixit::logger::Logger;
 
-std::unordered_map<std::string, std::string> listFilesRecursive(const fs::path& directory) {
+using json = nlohmann::json;
+namespace fs = std::filesystem;
+
+
+std::unordered_map<std::string, std::string> SchemaCatalog::listFilesRecursive(const std::filesystem::path& directory) {
     std::unordered_map<std::string, std::string> fileMap;
-
-    if (!fs::exists(directory) || !fs::is_directory(directory)) {
-        std::cerr << "Errore: La directory non esiste!" << std::endl;
+    
+    if (!std::filesystem::exists(directory) || !std::filesystem::is_directory(directory)) {
+        Logger::getInstance().error("Provided directory does not exist: <"+directory.string()+">");
         return fileMap;
     }
-
-    for (const auto& entry : fs::recursive_directory_iterator(directory)) {
-        if (fs::is_regular_file(entry)) {
+    
+    for (const auto& entry : std::filesystem::recursive_directory_iterator(directory)) {
+        if (std::filesystem::is_regular_file(entry) && entry.path().extension() == ".json") {
             std::string fullPath = entry.path().string();
-            std::string relativePath = fs::relative(entry.path(), directory).string();
+            std::string relativePath = std::filesystem::relative(entry.path(), directory).string();
 
             // Sostituisci '/' con '.' nella chiave
             std::replace(relativePath.begin(), relativePath.end(), '/', '.');
@@ -38,187 +42,88 @@ std::unordered_map<std::string, std::string> listFilesRecursive(const fs::path& 
     return fileMap;
 }
 
-
-SchemaCatalog::SchemaCatalog(const std::string& originDirectory, const Logger::Level logLevel) {
-    this->originDirectory = originDirectory;
+SchemaCatalog::SchemaCatalog(const std::string& originDirectory, const Logger::Level logLevel) 
+    : originDirectory(originDirectory), schemaMap() {
 
     Logger::getInstance().setSeverity(logLevel);
-    Logger::getInstance().info("Registering nodes...");
     
+    // Register first set of classes
     ChainFactory::getInstance().registerClass<NodeRoot>("root");
     ChainFactory::getInstance().registerClass<NodeRoot>("goto");
     ChainFactory::getInstance().registerClass<NodeDetour>("detour");
-
     ChainFactory::getInstance().registerClass<NodeArray>("array");
     ChainFactory::getInstance().registerClass<NodeIf>("if");
     ChainFactory::getInstance().registerClass<NodeRouter>("router");
     ChainFactory::getInstance().registerClass<NodeFunctionLua>("function lua");
-
     ChainFactory::getInstance().registerClass<NodeUnsignedInteger>("unsigned integer");
-
-
-    Logger::getInstance().info("Loading catalog from directory <" + this->originDirectory + "> ...");
-    auto schemaMap = listFilesRecursive(this->originDirectory);
-    Logger::getInstance().info("Collected " + std::to_string(schemaMap.size()) + " schemas");
-    Logger::getInstance().info("Parsing schemas...");
-    for (const auto& [schemaName, schemaFilePath] : schemaMap) {
+    
+    Logger::getInstance().info("Loading catalog from directory <" + originDirectory + "> ...");    
+    auto fileList = listFilesRecursive(originDirectory);
+    Logger::getInstance().info("Parsing " + std::to_string(fileList.size()) + " collected schema(s)");
+    for (const auto& [schemaName, schemaFilePath] : fileList) {
         Logger::getInstance().debug("Parsing schema <" + schemaName + "> from <" + schemaFilePath + ">");
         nlohmann::json jsonData;
-        std::ifstream inputFile(schemaFilePath);
-        if (!inputFile.is_open()) {
-            Logger::getInstance().error("Impossible to open file " + schemaFilePath);
-        }
         try {
-            inputFile >> jsonData;
+            std::ifstream inputFile(schemaFilePath);
+
+            if (!inputFile.is_open()) {
+                Logger::getInstance().error("Unable to open file: " + schemaFilePath);
+                return; 
+            }
+                
+            try {
+                jsonData = nlohmann::json::parse(inputFile);                
+            } catch (const nlohmann::json::parse_error& e) {
+                return;
+            } catch (const std::exception& e) {
+                return;
+            }
             inputFile.close();
-        } catch (const nlohmann::json::parse_error& e) {
-            Logger::getInstance().error("File not correctly loaded: " + std::string(e.what()));
+
+        } catch (const std::exception& e) {
+            Logger::getInstance().error("Unexpected error loading file (" + schemaFilePath + "): " + std::string(e.what()));
+            return;
         }
-        if(parseSchema(schemaName, jsonData) < 0){
+        
+        if(parseSchema(schemaName, jsonData) != 0){
             Logger::getInstance().error("Schema not correctly parsed");
         } else {
             Logger::getInstance().debug("Schema correctly parsed");
         }
     }
 
+    Logger::getInstance().debug("Parsed "+std::to_string(schemaMap.size())+" schema(s)");
 };
 
+
 const std::shared_ptr<ChainNode> SchemaCatalog::getAbstractChain(const std::string& schemaName) const {
+    if (schemaMap.empty()) {
+        Logger::getInstance().error("Schema catalog is empty!");
+        return nullptr;
+    }
     auto it = schemaMap.find(schemaName);
     if (it != schemaMap.end()) {
 //        return it->second.getNode("main");//->clone();
-        return it->second.getChainStartingNode();
+        //auto node = it->second.getChainStartingNode();
+        auto node = it->second->getChainStartingNode();
+        if (node) {
+            return node;
+        } else {
+            Logger::getInstance().error("Chain starting node is null for schema <" + schemaName + ">");
+        }
     } else {
         Logger::getInstance().warning("Requested schema <" + schemaName + "> does not exist in the loaded catalog");
     }
     return nullptr;
 }
 
-/*
 const std::shared_ptr<ChainNode> SchemaCatalog::parseSchemaOnTheFly(const nlohmann::json& jsonSchema) {
-    Schema schema;
-    if(jsonSchema.is_object()){
-        for (const auto& [key, val] : jsonSchema.items()) {
-            if(key=="nodes" && val.type() == nlohmann::json::value_t::object){
-                // Check for a valid starting point ("main" root node)
-                std::string mainRootNodeId = "";
-                for (const auto& [id, node] : val.items()) {
-                    if (node.is_object() && node.contains("name") && node.contains("type")) {
-                        if (node["name"] == "main" && node["type"] == "root") {
-                            mainRootNodeId = id;
-                            break;
-                        }
-                    }
-                }
-                if(mainRootNodeId.empty()){
-                    Logger::getInstance().log("Error in parsing nodes: no 'main' root node found", Logger::Level::ERROR);
-                    return nullptr;
-                }
-                // list all the nodes
-                for (auto& [nodeId, nodeStructure] : val.items()) {
-                    auto thisNode = evalObject(nodeStructure, schema.getChain());
-                    if(!thisNode){
-                        Logger::getInstance().error("Error in parsing node <"+nodeId+">");
-                        return nullptr;
-                    }
-                    auto thisNodeValue = thisNode.value();
-                    thisNodeValue->setId(nodeId);
-                    schema.addNode(nodeId, thisNodeValue);
-                    if(nodeId == mainRootNodeId){
-                        schema.setChainStartingNode(thisNodeValue);                       
-                    }
-                }     
-            } else if(key=="metadata" && val.type() == nlohmann::json::value_t::object){
-                std::unordered_map<std::string, std::string> metadata;
-                for(auto& [key, val] : val.items()){
-                    if(val.type() == nlohmann::json::value_t::string){
-                        metadata[key] = val.get<std::string>();
-                    } else {
-                        Logger::getInstance().log("Unsupported type for element <" + key + ">: elements in <metadata> section can be only string", Logger::Level::WARNING);
-                        return nullptr;
-                    }
-                }
-                schema.setMetadata(metadata);
-            } else if(key=="version" && val.type() == nlohmann::json::value_t::string){
-                schema.setVersion(val.get<std::string>());
-            } else {
-                Logger::getInstance().log("Unsupported type: " + std::to_string(static_cast<int>(jsonSchema.type())) + " for element named <" + key + ">", Logger::Level::WARNING);
-                return nullptr;
-            }
-        }
-    } else {
-        Logger::getInstance().log("Provided JSON Schema is not an object", Logger::Level::ERROR);
+    auto schema = parseSchema(jsonSchema);
+    if(schema == nullptr){
+        Logger::getInstance().error("Error in parsing schema on the fly");
         return nullptr;
-    } 
-
-    return schema.getChainStartingNode();
-}
-
-
-int SchemaCatalog::parseSchema(const std::string& name, const nlohmann::json& jsonSchema) {
-    Schema schema;
-    schema.setCatalogName(name);
-    if(jsonSchema.is_object()){
-        for (const auto& [key, val] : jsonSchema.items()) {
-            if(key=="nodes" && val.type() == nlohmann::json::value_t::object){
-                // Check for a valid starting point ("main" root node)
-                std::string mainRootNodeId = "";
-                for (const auto& [id, node] : val.items()) {
-                    if (node.is_object() && node.contains("name") && node.contains("type")) {
-                        if (node["name"] == "main" && node["type"] == "root") {
-                            mainRootNodeId = id;
-                            break;
-                        }
-                    }
-                }
-                if(mainRootNodeId.empty()){
-                    Logger::getInstance().log("Error in parsing nodes: no 'main' root node found", Logger::Level::ERROR);
-                    return 4;
-                }
-                // list all the nodes
-                for (auto& [nodeId, nodeStructure] : val.items()) {
-                    auto thisNode = evalObject(nodeStructure, schema.getChain());
-                    if(!thisNode){
-                        Logger::getInstance().error("Error in parsing node <"+nodeId+">");
-                        return 4;
-                    }
-                    auto thisNodeValue = thisNode.value();
-                    thisNodeValue->setId(nodeId);
-                    schema.addNode(nodeId, thisNodeValue);
-                    if(nodeId == mainRootNodeId){
-                        schema.setChainStartingNode(thisNodeValue);                       
-                    }
-                }     
-            } else if(key=="metadata" && val.type() == nlohmann::json::value_t::object){
-                std::unordered_map<std::string, std::string> metadata;
-                for(auto& [key, val] : val.items()){
-                    if(val.type() == nlohmann::json::value_t::string){
-                        metadata[key] = val.get<std::string>();
-                    } else {
-                        Logger::getInstance().log("Unsupported type for element <" + key + ">: elements in <metadata> section can be only string", Logger::Level::WARNING);
-                        return 3;
-                    }
-                }
-                schema.setMetadata(metadata);
-            } else if(key=="version" && val.type() == nlohmann::json::value_t::string){
-                schema.setVersion(val.get<std::string>());
-            } else {
-                Logger::getInstance().log("Unsupported type: " + std::to_string(static_cast<int>(jsonSchema.type())) + " for element named <" + key + "> in file <" + name + ">", Logger::Level::WARNING);
-                return 2;
-            }
-        }
-    } else {
-        Logger::getInstance().log("Provided JSON Schema is not an object", Logger::Level::ERROR);
-        return 1;
-    } 
-
-    schemaMap[name] = schema;
-    return 0;
-}
-*/
-
-const std::shared_ptr<ChainNode> SchemaCatalog::parseSchemaOnTheFly(const nlohmann::json& jsonSchema) {
-    return parseSchema(jsonSchema)->getChainStartingNode();
+    }
+    return schema->getChainStartingNode();
 }
 
 int SchemaCatalog::parseSchema(const std::string& name, const nlohmann::json& jsonSchema) {
@@ -227,8 +132,22 @@ int SchemaCatalog::parseSchema(const std::string& name, const nlohmann::json& js
         Logger::getInstance().error("Error in parsing schema <"+name+">");
         return 1;
     }
+    Logger::getInstance().debug("Inserting schema with key <" + name + ">");
     schema->setCatalogName(name);
-    schemaMap[name] = *schema;
+//    schemaMap[name] = *schema;
+//    schemaMap[name] = schema;
+    if (!name.empty() && std::all_of(name.begin(), name.end(), ::isprint)) {
+        schemaMap.insert({name, schema});
+        /*
+        auto [it, inserted] = schemaMap.try_emplace(name, schema);
+        if (!inserted) {
+            std::cerr << "Schema <" << name << "> already present, no update\n";
+        }
+        */
+    } else {
+        Logger::getInstance().error("Invalid name <" + name + ">");
+        return 2;
+    }
     return 0;
 }
 
@@ -248,7 +167,7 @@ const std::shared_ptr<Schema> SchemaCatalog::parseSchema(const nlohmann::json& j
                     }
                 }
                 if(mainRootNodeId.empty()){
-                    Logger::getInstance().log("Error in parsing nodes: no 'main' root node found", Logger::Level::ERROR);
+                    Logger::getInstance().error("Error in parsing nodes: no 'main' root node found");
                     return nullptr;
                 }
                 // list all the nodes
@@ -294,22 +213,6 @@ const std::shared_ptr<Schema> SchemaCatalog::parseSchema(const nlohmann::json& j
 std::optional<std::shared_ptr<ChainNode>> SchemaCatalog::evalArray(const nlohmann::json& jsonArray, const std::shared_ptr<ChainAccess> chain){
     std::shared_ptr<ChainNode> thisNode = std::make_shared<ChainNode>();
     thisNode->setChain(chain);
-    /*
-    for (const auto &entry : jsonArray) {
-        if(entry.type() == nlohmann::json::value_t::array){
-            Logger::getInstance().log("Error not expected an array in array", Logger::Level::ERROR);
-            return std::nullopt;
-        } else {
-            auto child = evalObject(entry, chain);
-            if(!child){
-                Logger::getInstance().error("Error in parsing structure '/'");
-                return std::nullopt;
-            }
-            child.value()->setChain(chain);
-            thisNode->addChild(child.value());
-        }
-    }
-    */
     return thisNode;
 }
 
@@ -326,11 +229,11 @@ std::optional<std::shared_ptr<ChainNode>> SchemaCatalog::evalObject(const nlohma
 
     // Instantiate object
     auto thisNode = ChainFactory::getInstance().create(type);
-    thisNode->setChain(chain);
     if(!thisNode){
         Logger::getInstance().error("Node creation failed for type: " + type);
         return std::nullopt;
     }
+    thisNode->setChain(chain);
 
     // Name
     if(jsonObject.contains("name") && jsonObject.at("name").is_string()){
@@ -348,8 +251,9 @@ std::optional<std::shared_ptr<ChainNode>> SchemaCatalog::evalObject(const nlohma
             Logger::getInstance().error("Invalid type for key 'attributes', object expected");
             return std::nullopt;
         }
+
         auto attributes = jsonObject.at("attributes");
-        for (auto& [attributeName, attributeValue] : attributes.items()) {
+        for (auto& [attributeName, attributeValue] : attributes.items()) {            
             auto attribute = evalAttribute(attributeValue);
             if(!attribute){
                 Logger::getInstance().error("Invalid attribute with attribute name <"+attributeName+">");
@@ -357,35 +261,8 @@ std::optional<std::shared_ptr<ChainNode>> SchemaCatalog::evalObject(const nlohma
             }
             thisNode->addAttribute(attributeName, *attribute.value());
         }
-    } 
 
-    // Structure
-    /*
-    if(jsonObject.contains("structure")){
-
-        if(!jsonObject.at("structure").is_object()){
-            Logger::getInstance().error("Invalid type for key 'structure', object expected");
-            return std::nullopt;
-        }
-        auto structure = jsonObject.at("structure");
-        for (auto it = structure.begin(); it != structure.end(); ++it) {
-            if (!it.value().is_object()) {
-                Logger::getInstance().error("Invalid type for element '" + it.key() + "' in 'structure', object expected");
-                return std::nullopt;
-            }
-            auto localRootNode = evalObject(it.value(), chain);
-            if(!localRootNode){
-                Logger::getInstance().error("Error in parsing structure with key = '"+it.key()+"'");
-                return std::nullopt;
-            }
-            localRootNode.value()->setId(it.key());
-            auto child = localRootNode.value();
-            child->setChain(chain);
-            thisNode->addChild(child);
-             
-        }                
     } 
-    */
 
     return thisNode;
 }
@@ -441,7 +318,7 @@ std::string SchemaCatalog::to_string(size_t indent = 0) const {
     oss << "{\n" << indentStr; 
     for (const auto& [schemaName, schemaDefinition] : schemaMap) {
         oss << indentStr << "\"" << schemaName << "\": {\n";
-        oss << indentStr << schemaDefinition.to_string() << "\n";
+        oss << indentStr << schemaDefinition->to_string() << "\n";
         oss << "}\n";
     }
     oss << "}\n";

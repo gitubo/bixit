@@ -7,36 +7,33 @@ using Endianess = bixit::abstract_chain::Endianness;
 namespace bixit::abstract_chain {
     class NodeUnsignedInteger : public ChainNode {
 
-    public:
-
     private:
-        size_t bitLength = 0;
-        Endianness endianness = Endianness::BIG;
+        size_t bitLength;
+        Endianness endianness;
 
     public:
-        NodeUnsignedInteger() : ChainNode() {}
-
+        NodeUnsignedInteger() : ChainNode(), bitLength(0), endianness(Endianness::BIG) {};
+        
         void addAttribute(const std::string& key, const ChainNodeAttribute& attribute) override {
             ChainNode::addAttribute(key,attribute);
-            
             if(key=="bit_length"){
                 if(!attribute.isInteger()){
-                    Logger::getInstance().log("Attribute <bit_length> is not an integer", Logger::Level::ERROR);
+                    Logger::getInstance().error("Attribute <bit_length> is not an integer");
                 } else {
                     bitLength = attribute.getInteger().value();
                     if(bitLength<=0){
-                        Logger::getInstance().log("Attribute <bit_length> is not valid (<=0)", Logger::Level::ERROR);
+                        Logger::getInstance().error("Attribute <bit_length> is not valid (<=0)");
                         bitLength = 0;
                     }
                 }
             } else if(key=="endianness"){
                 if(!attribute.isString()){
-                    Logger::getInstance().log("Attribute <endianness> is not a string", Logger::Level::ERROR);
+                    Logger::getInstance().error("Attribute <endianness> is not a string");
                 } else {
                     auto endianess_str = attribute.getString().value();
-                    if(endianess_str.compare("big")){
+                    if (endianess_str == "big") {
                         endianness = Endianness::BIG;
-                    } else if(endianess_str.compare("little")){
+                    } else if (endianess_str == "little") {
                         endianness = Endianness::LITTLE;
                     } else {
                         endianness = Endianness::BIG;
@@ -48,6 +45,10 @@ namespace bixit::abstract_chain {
         }
 
         int bitstream_to_json(BitStream& bitStream, nlohmann::ordered_json& outputJson) const override {
+            if (bitLength == 0) {
+                Logger::getInstance().error("Node <" + getFullName() + "> has invalid bitLength = 0");
+                return 1;
+            }
             uint64_t value = 0;            
             int convertion_error = 0;
             try{
@@ -74,7 +75,6 @@ namespace bixit::abstract_chain {
             if(nextNode){
                 nextNode->bitstream_to_json(bitStream, outputJson);
             }
-
             return 0;
         }
 
@@ -87,36 +87,24 @@ namespace bixit::abstract_chain {
                 Logger::getInstance().error("Key <"+this->getFullName()+"> not found in the provided json object or the related value is not an integer");
                 return 100;      
             }
-            uint64_t rawValue = inputJson[this->getFullName()];
-            uint64_t value = 0;
-            switch (endianness){
-                case Endianness::BIG:
-                    value = rawValue;
-/*                     for (int i = 0; i < sizeof(uint64_t); ++i) {
-                        value |= ((rawValue >> (i * 8)) & 0xFF) << ((7 - i) * 8);
-                    }
- */                    break;
-                case Endianness::LITTLE:
-                    // No convertion needed
-                    value = rawValue;
-                    break;
-                default:
-                    Logger::getInstance().warning("Unsupported endianness");
-                    return 100;
-            }
-     
-            uint8_t inputBuffer[(bitLength+7)/8];
-            std::memcpy(inputBuffer, &value, (bitLength+7)/8);
-            BitStream bsInteger(inputBuffer, bitLength);
-            bitStream.append(bsInteger);
+
+            uint64_t value = inputJson[this->getFullName()];
+            
+            uint8_t valueBuffer[8];
+            std::memcpy(valueBuffer, reinterpret_cast<const uint8_t*>(&value), 8);
+
+            //memcpy(valueBuffer, &value, 8);   
+//            BitStream bsInteger(valueBuffer, bitLength);
+//            bitStream.append(bsInteger);
+            bitStream.append(valueBuffer, bitLength, 8);
 
             // Propagate to the next node (if any)
             auto nextNode = getNextNode();
             if(nextNode){
                 nextNode->json_to_bitstream(inputJson, bitStream);
             }
-
             return 0;
         }
+            
     };
 }
