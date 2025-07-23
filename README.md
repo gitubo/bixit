@@ -6,7 +6,7 @@
 
 **Why Use Bixit?**
 
-Binary messages are concise and efficient, but they have a rigid format, which often means having many different parsers that are difficult to customize and keep aligned—especially during prototyping and testing. Bixit helps solve these kinds of problems without compromise: need to support a new version of your format? It's as easy as moving a configuration file.
+Binary messages are concise and efficient, but they have a rigid format, which often means having many different parsers that are difficult to customize and keep aligned — especially during prototyping and testing. Bixit helps solve these kinds of problems without compromise: need to support a new version of your format? It's as easy as moving a configuration file.
 
 * **Wide Applicability:** Ideal for IoT, embedded systems, automotive, aerospace, railway and gateways.
 * **Zero Compromise:** Define complex binary formats with bit-level precision.
