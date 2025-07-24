@@ -1,19 +1,18 @@
-Ecco il file index.html aggiornato con le modifiche richieste nella sezione "Features and Benefits".
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bixit - Your Uncompromising Binary Message Dissector</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <header>
-        <nav>
+    <header class="py-4">
+        <nav class="container flex justify-between items-center">
             <div class="logo">Bixit</div>
-            <ul>
+            <ul class="flex space-x-6">
                 <li><a href="#features">Features</a></li>
                 <li><a href="#how-it-works">How It Works</a></li>
                 <li><a href="#genesis">The Genesis</a></li>
@@ -22,99 +21,121 @@ Ecco il file index.html aggiornato con le modifiche richieste nella sezione "Fea
     </header>
 
     <main>
-        <section id="hero">
-            <div class="hero-content">
-                <h1>Bixit: Uncompromising Binary Message Dissection</h1>
-                <p>Bixit is a powerful and configurable binary message dissector designed to convert binary messages into easy-to-read JSON and back.</p>
-                <a href="#cta" class="cta-button">Get Started Now</a>
-            </div>
-        </section>
-
-        <section id="features">
-            <h2>Features and Benefits</h2>
-            <div class="features-grid">
-                <div class="feature-item">
-                    <span>🌍</span> <!-- Emoji per Wide Applicability -->
-                    <h3>Wide Applicability</h3>
-                    <p>Ideal for IoT, embedded systems, automotive, aerospace, railway, and gateways.</p>
+        <section id="hero" class="bg-gradient-to-r from-blue-50 to-white py-20">
+            <div class="container flex flex-col md:flex-row items-center md:justify-between gap-8">
+                <div class="hero-content md:w-1/2 text-center md:text-left">
+                    <h1 class="text-4xl md:text-5xl font-bold leading-tight mb-4">Bixit: Uncompromising Binary Message Dissection</h1>
+                    <p class="text-lg md:text-xl mb-8">Bixit is a powerful and configurable binary message dissector designed to convert binary messages into easy-to-read JSON and back.</p>
+                    <a href="#cta" class="cta-button">Get Started Now</a>
                 </div>
-                <div class="feature-item">
-                    <span>🎯</span> <!-- Emoji per Zero Compromise -->
-                    <h3>Zero Compromise</h3>
-                    <p>Define complex binary formats with bit-level precision.</p>
-                </div>
-                <div class="feature-item">
-                    <span>✍️</span> <!-- Emoji per No Need to Code -->
-                    <h3>No Need to Code</h3>
-                    <p>Configure (de)serialization via text files, no coding required.</p>
-                </div>
-                <div class="feature-item">
-                    <span>🧩</span> <!-- Emoji per Maximum Flexibility -->
-                    <h3>Maximum Flexibility</h3>
-                    <p>Modular architecture for future expansions via Lua scripting.</p>
-                </div>
-                <div class="feature-item">
-                    <span>⚡</span> <!-- Emoji per High Performance -->
-                    <h3>High Performance</h3>
-                    <p>Fast and efficient (de)serialization engine.</p>
-                </div>
-                <div class="feature-item">
-                    <span>🔗</span> <!-- Emoji per Easy Integration -->
-                    <h3>Easy Integration</h3>
-                    <p>Lightweight and linkable C++ shared library.</p>
-                </div>
-                <div class="feature-item">
-                    <span>🗂️</span> <!-- Emoji per Multi-Format Management -->
-                    <h3>Multi-Format Management</h3>
-                    <p>Organize and manage multiple formats and versions in a structured catalog.</p>
-                </div>
-                <div class="feature-item">
-                    <span>🚀</span> <!-- Emoji per Develop anywhere, Deploy anywhere -->
-                    <h3>Develop anywhere, Deploy anywhere</h3>
-                    <p>Design your message format on any environment and then deploy it to various target environments without any modification.</p>
+                <div class="carousel-container md:w-1/2 flex justify-center">
+                    <img src="https://placehold.co/600x350/AEC6CF/FFFFFF?text=Bixit+Image+1" alt="Bixit Image 1" class="carousel-image active">
+                    <img src="https://placehold.co/600x350/FFDAB9/FFFFFF?text=Bixit+Image+2" alt="Bixit Image 2" class="carousel-image">
+                    <img src="https://placehold.co/600x350/B0E0E6/FFFFFF?text=Bixit+Image+3" alt="Bixit Image 3" class="carousel-image">
+                    <img src="https://placehold.co/600x350/DDA0DD/FFFFFF?text=Bixit+Image+4" alt="Bixit Image 4" class="carousel-image">
+                    <button class="carousel-button prev" onclick="moveCarousel(-1)">&#10094;</button>
+                    <button class="carousel-button next" onclick="moveCarousel(1)">&#10095;</button>
                 </div>
             </div>
         </section>
 
-        <section id="how-it-works">
-            <h2>How It Works: Quick Guide</h2>
-            <div class="steps">
-                <div class="step">
-                    <span>1</span>
-                    <h3>Installation</h3>
-                    <p>Bixit uses CMake. Follow the standard workflow: <code>mkdir build && cd build && cmake .. && make -j$(nproc)</code>.</p>
-                </div>
-                <div class="step">
-                    <span>2</span>
-                    <h3>Format Definition</h3>
-                    <p>Create a configuration file (JSON) that describes the structure of your binary message.</p>
-                </div>
-                <div class="step">
-                    <span>3</span>
-                    <h3>Usage</h3>
-                    <p>Integrate the library into your C++ code and use its API to encode/decode messages.</p>
+        <section id="features" class="py-16 bg-white">
+            <div class="container">
+                <h2 class="text-3xl font-bold text-center mb-12">Features and Benefits</h2>
+                <div class="features-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div class="feature-item">
+                        <span>🌍</span>
+                        <h3>Wide Applicability</h3>
+                        <p>Ideal for IoT, embedded systems, automotive, aerospace, railway, and gateways.</p>
+                    </div>
+                    <div class="feature-item">
+                        <span>🎯</span>
+                        <h3>Zero Compromise</h3>
+                        <p>Define complex binary formats with bit-level precision.</p>
+                    </div>
+                    <div class="feature-item">
+                        <span>✍️</span>
+                        <h3>No Need to Code</h3>
+                        <p>Configure (de)serialization via text files, no coding required.</p>
+                    </div>
+                    <div class="feature-item">
+                        <span>🧩</span>
+                        <h3>Maximum Flexibility</h3>
+                        <p>Modular architecture for future expansions via Lua scripting.</p>
+                    </div>
+                    <div class="feature-item">
+                        <span>⚡</span>
+                        <h3>High Performance</h3>
+                        <p>Fast and efficient (de)serialization engine.</p>
+                    </div>
+                    <div class="feature-item">
+                        <span>🔗</span>
+                        <h3>Easy Integration</h3>
+                        <p>Lightweight and linkable C++ shared library.</p>
+                    </div>
+                    <div class="feature-item">
+                        <span>🗂️</span>
+                        <h3>Multi-Format Management</h3>
+                        <p>Organize and manage multiple formats and versions in a structured catalog.</p>
+                    </div>
+                    <div class="feature-item">
+                        <span>🚀</span>
+                        <h3>Develop anywhere, Deploy anywhere</h3>
+                        <p>Design your message format on any environment and then deploy it to various target environments without any modification.</p>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <section id="genesis">
-            <h2>The Genesis of Bixit: Addressing Real-World Needs</h2>
-            <p>
-                Bixit was born out of real-world challenges encountered in the <strong>railway industry</strong>, where a multitude of actors exchange a wide variety of binary messages, each with its own complex format. Developing software that interacts with such message streams is often <strong>costly and time-consuming</strong>, especially during <strong>prototyping and testing</strong> phases. Bixit was created to solve exactly this problem: a <strong>fast, deeply configurable</strong> and <strong>easy-to-integrate dissector</strong> that streamlines the message decoding pipeline, dramatically reducing time and effort, allowing engineering teams to focus on what matters most: the business logic.
-            </p>
+        <section id="how-it-works" class="py-16 bg-gray-50">
+            <div class="container">
+                <h2 class="text-3xl font-bold text-center mb-12">How It Works: Quick Guide</h2>
+                <div class="steps grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="step">
+                        <span>1</span>
+                        <h3>Installation</h3>
+                        <p>Bixit uses CMake. Follow the standard workflow: <code>mkdir build && cd build && cmake .. && make -j$(nproc)</code>.</p>
+                    </div>
+                    <div class="step">
+                        <span>2</span>
+                        <h3>Format Definition</h3>
+                        <p>Create a configuration file (JSON) that describes the structure of your binary message.</p>
+                    </div>
+                    <div class="step">
+                        <span>3</span>
+                        <h3>Usage</h3>
+                        <p>Integrate the library into your C++ code and use its API to encode/decode messages.</p>
+                    </div>
+                </div>
+            </div>
         </section>
 
-        <section id="cta">
-            <h2>Ready to Simplify Binary Message Management?</h2>
-            <p>Stop wrestling with complex configurations and start decoding what truly matters.</p>
-            <a href="https://github.com/gitubo/bixit" class="cta-button" target="_blank" rel="noopener noreferrer">Discover Bixit on GitHub</a>
+        <section id="genesis" class="py-16 bg-white">
+            <div class="container">
+                <h2 class="text-3xl font-bold text-center mb-12">The Genesis of Bixit: Addressing Real-World Needs</h2>
+                <p class="text-lg leading-relaxed text-center max-w-3xl mx-auto">
+                    Bixit was born out of real-world challenges encountered in the <strong>railway industry</strong>, where a multitude of actors exchange a wide variety of binary messages, each with its own complex format. Developing software that interacts with such message streams is often <strong>costly and time-consuming</strong>, especially during <strong>prototyping and testing</strong> phases. Bixit was created to solve exactly this problem: a <strong>fast, deeply configurable</strong> and <strong>easy-to-integrate dissector</strong> that streamlines the message decoding pipeline, dramatically reducing time and effort, allowing engineering teams to focus on what matters most: the business logic.
+                </p>
+            </div>
+        </section>
+
+        <section id="cta" class="py-16 bg-blue-50 text-center">
+            <div class="container">
+                <h2 class="text-3xl font-bold mb-6">Ready to Simplify Binary Message Management?</h2>
+                <p class="text-lg mb-8">Stop wrestling with complex configurations and start decoding what truly matters.</p>
+                <a href="https://github.com/gitubo/bixit" class="cta-button" target="_blank" rel="noopener noreferrer">Discover Bixit on GitHub</a>
+            </div>
         </section>
     </main>
 
-    <footer>
-        <p>&copy; 2025 Bixit. All rights reserved.</p>
-        <p><a href="https://github.com/gitubo/bixit" target="_blank" rel="noopener noreferrer">View Project on GitHub</a></p>
-        <p><a href="https://www.gnu.org/licenses/lgpl-3.0" target="_blank" rel="noopener noreferrer">LGPL v3 License</a></p>
+    <footer class="py-8 text-center text-sm">
+        <div class="container">
+            <p>&copy; 2025 Bixit. All rights reserved.</p>
+            <p class="mt-2">
+                <a href="https://github.com/gitubo/bixit" target="_blank" rel="noopener noreferrer" class="hover:underline">View Project on GitHub</a> |
+                <a href="https://www.gnu.org/licenses/lgpl-3.0" target="_blank" rel="noopener noreferrer" class="hover:underline">LGPL v3 License</a>
+            </p>
+        </div>
     </footer>
 
     <script src="script.js"></script>
