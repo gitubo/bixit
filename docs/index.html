@@ -5,7 +5,188 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bixit - Your Uncompromising Binary Message Dissector</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Custom styles */
+        .logo {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #2563eb;
+        }
+        
+        nav a {
+            color: #374151;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        
+        nav a:hover {
+            color: #2563eb;
+        }
+        
+        .cta-button {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.3);
+        }
+        
+        /* Carousel styles - FIXED */
+        .carousel-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            height: 350px; /* Fixed height to prevent overlap */
+            overflow: hidden;
+            border-radius: 1rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .carousel-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+        
+        .carousel-image.active {
+            opacity: 1;
+        }
+        
+        .carousel-button {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+        
+        .carousel-button:hover {
+            background: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .carousel-button.prev {
+            left: 15px;
+        }
+        
+        .carousel-button.next {
+            right: 15px;
+        }
+        
+        /* Feature styles */
+        .feature-item {
+            text-align: center;
+            padding: 2rem;
+            border-radius: 1rem;
+            background: white;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease;
+        }
+        
+        .feature-item:hover {
+            transform: translateY(-5px);
+        }
+        
+        .feature-item span {
+            font-size: 3rem;
+            display: block;
+            margin-bottom: 1rem;
+        }
+        
+        .feature-item h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #1f2937;
+        }
+        
+        .feature-item p {
+            color: #6b7280;
+            line-height: 1.6;
+        }
+        
+        /* Steps styles */
+        .step {
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .step span {
+            display: inline-block;
+            width: 60px;
+            height: 60px;
+            background: #2563eb;
+            color: white;
+            border-radius: 50%;
+            line-height: 60px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+        
+        .step h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #1f2937;
+        }
+        
+        .step p {
+            color: #6b7280;
+            line-height: 1.6;
+        }
+        
+        .step code {
+            background: #f3f4f6;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.875rem;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .carousel-container {
+                height: 250px;
+                margin-top: 2rem;
+            }
+            
+            .hero-content h1 {
+                font-size: 2rem;
+            }
+            
+            .hero-content p {
+                font-size: 1rem;
+            }
+        }
+    </style>
 </head>
 <body>
 
@@ -22,19 +203,26 @@
 
     <main>
         <section id="hero" class="bg-gradient-to-r from-blue-50 to-white py-20">
-            <div class="container flex flex-col md:flex-row items-center md:justify-between gap-8">
-                <div class="hero-content md:w-1/2 text-center md:text-left flex-shrink-0">
-                    <h1 class="text-4xl md:text-5xl font-bold leading-tight mb-4">Bixit: Uncompromising Binary Message Dissection</h1>
-                    <p class="text-lg md:text-xl mb-8">Bixit is a powerful and configurable binary message dissector designed to convert binary messages into easy-to-read JSON and back.</p>
-                    <a href="#cta" class="cta-button">Get Started Now</a>
-                </div>
-                <div class="carousel-container md:w-1/2 flex justify-center flex-grow">
-                    <img src="https://placehold.co/600x350/AEC6CF/FFFFFF?text=Bixit+Image+1" alt="Bixit Image 1" class="carousel-image active">
-                    <img src="https://placehold.co/600x350/FFDAB9/FFFFFF?text=Bixit+Image+2" alt="Bixit Image 2" class="carousel-image">
-                    <img src="https://placehold.co/600x350/B0E0E6/FFFFFF?text=Bixit+Image+3" alt="Bixit Image 3" class="carousel-image">
-                    <img src="https://placehold.co/600x350/DDA0DD/FFFFFF?text=Bixit+Image+4" alt="Bixit Image 4" class="carousel-image">
-                    <button class="carousel-button prev" onclick="moveCarousel(-1)">&#10094;</button>
-                    <button class="carousel-button next" onclick="moveCarousel(1)">&#10095;</button>
+            <div class="container">
+                <div class="flex flex-col md:flex-row items-center gap-12">
+                    <!-- Hero Content - Left Side -->
+                    <div class="flex-1 text-center md:text-left">
+                        <h1 class="text-4xl md:text-5xl font-bold leading-tight mb-4">Bixit: Uncompromising Binary Message Dissection</h1>
+                        <p class="text-lg md:text-xl mb-8">Bixit is a powerful and configurable binary message dissector designed to convert binary messages into easy-to-read JSON and back.</p>
+                        <a href="#cta" class="cta-button">Get Started Now</a>
+                    </div>
+                    
+                    <!-- Carousel - Right Side -->
+                    <div class="flex-1 flex justify-center">
+                        <div class="carousel-container">
+                            <img src="https://placehold.co/600x350/AEC6CF/FFFFFF?text=Bixit+Image+1" alt="Bixit Image 1" class="carousel-image active">
+                            <img src="https://placehold.co/600x350/FFDAB9/FFFFFF?text=Bixit+Image+2" alt="Bixit Image 2" class="carousel-image">
+                            <img src="https://placehold.co/600x350/B0E0E6/FFFFFF?text=Bixit+Image+3" alt="Bixit Image 3" class="carousel-image">
+                            <img src="https://placehold.co/600x350/DDA0DD/FFFFFF?text=Bixit+Image+4" alt="Bixit Image 4" class="carousel-image">
+                            <button class="carousel-button prev" onclick="moveCarousel(-1)">&#10094;</button>
+                            <button class="carousel-button next" onclick="moveCarousel(1)">&#10095;</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -138,6 +326,29 @@
         </div>
     </footer>
 
-    <script src="script.js"></script>
+    <script>
+        let currentSlide = 0;
+        const images = document.querySelectorAll('.carousel-image');
+        const totalSlides = images.length;
+
+        function showSlide(index) {
+            images.forEach((img, i) => {
+                img.classList.toggle('active', i === index);
+            });
+        }
+
+        function moveCarousel(direction) {
+            currentSlide = (currentSlide + direction + totalSlides) % totalSlides;
+            showSlide(currentSlide);
+        }
+
+        // Auto-play carousel
+        setInterval(() => {
+            moveCarousel(1);
+        }, 4000);
+
+        // Initialize
+        showSlide(0);
+    </script>
 </body>
 </html>
