@@ -9,8 +9,9 @@ h1, h2, h3 {
     line-height: 1.2;
 }
 .highlight {
-    color: #FF6347; /* Un rosso-arancio acceso */
-    font-weight: bold;
+    background-color: #FFF000; /* Giallo carico, puoi usare un hex code specifico come #FFD700 per un giallo più oro */
+    padding: 0.1em 0.2em; /* Piccola imbottitura per dare un po' di respiro intorno al testo evidenziato */
+    border-radius: 3px;
 }
 a {
     color: #007BFF;
