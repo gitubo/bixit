@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bixit - Il Tuo Nuovo Progetto</title>
+    <title>Bixit - Il Tuo Dissettore di Messaggi Binari Senza Compromessi</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -14,6 +14,7 @@
             <ul>
                 <li><a href="#features">Caratteristiche</a></li>
                 <li><a href="#how-it-works">Come Funziona</a></li>
+                <li><a href="#genesis">La Genesi</a></li>
             </ul>
         </nav>
     </header>
@@ -21,64 +22,86 @@
     <main>
         <section id="hero">
             <div class="hero-content">
-                <h1>Il Titolo Accattivante del Tuo Progetto Bixit</h1>
-                <p>Una breve e chiara descrizione di cosa fa Bixit e quale problema risolve.</p>
-                <a href="#cta" class="cta-button">Inizia Subito</a>
+                <h1>Bixit: Dissezione di Messaggi Binari Senza Compromessi</h1>
+                <p>Bixit è un potente e configurabile dissettore di messaggi binari progettato per convertire messaggi binari in JSON di facile lettura e viceversa.</p>
+                <a href="#cta" class="cta-button">Inizia Ora</a>
             </div>
         </section>
 
         <section id="features">
-            <h2>Perché Scegliere Bixit?</h2>
+            <h2>Caratteristiche e Vantaggi</h2>
             <div class="features-grid">
                 <div class="feature-item">
-                    <img src="https://via.placeholder.com/80" alt="Icona Caratteristica 1">
-                    <h3>Caratteristica 1</h3>
-                    <p>Descrivi qui il primo punto di forza del tuo progetto.</p>
+                    <!-- Icona o testo rappresentativo -->
+                    <h3>Ampia Applicabilità</h3>
+                    <p>Ideale per IoT, sistemi embedded, automotive, aerospaziale, ferroviario e gateway.</p>
                 </div>
                 <div class="feature-item">
-                    <img src="https://via.placeholder.com/80" alt="Icona Caratteristica 2">
-                    <h3>Caratteristica 2</h3>
-                    <p>Spiega qui un altro incredibile vantaggio di Bixit.</p>
+                    <h3>Zero Compromessi</h3>
+                    <p>Definisci formati binari complessi con precisione a livello di bit.</p>
                 </div>
                 <div class="feature-item">
-                    <img src="https://via.placeholder.com/80" alt="Icona Caratteristica 3">
-                    <h3>Caratteristica 3</h3>
-                    <p>Aggiungi qui una terza caratteristica che rende Bixit unico.</p>
+                    <h3>Nessun Codice da Scrivere</h3>
+                    <p>Configura (de)serializzazione tramite file di testo, nessuna codifica richiesta.</p>
+                </div>
+                <div class="feature-item">
+                    <h3>Massima Flessibilità</h3>
+                    <p>Architettura modulare per future espansioni tramite scripting Lua.</p>
+                </div>
+                <div class="feature-item">
+                    <h3>Alte Prestazioni</h3>
+                    <p>Motore di (de)serializzazione veloce ed efficiente.</p>
+                </div>
+                <div class="feature-item">
+                    <h3>Facile Integrazione</h3>
+                    <p>Libreria condivisa C++ leggera e linkabile.</p>
+                </div>
+                <div class="feature-item">
+                    <h3>Gestione Multi-Formato</h3>
+                    <p>Organizza e gestisci più formati e versioni in un catalogo strutturato.</p>
                 </div>
             </div>
         </section>
 
         <section id="how-it-works">
-            <h2>Come Funziona</h2>
+            <h2>Come Funziona: Guida Rapida</h2>
             <div class="steps">
                 <div class="step">
                     <span>1</span>
-                    <h3>Registrati</h3>
-                    <p>Breve descrizione del primo passo da compiere.</p>
+                    <h3>Installazione</h3>
+                    <p>Bixit usa CMake. Segui il workflow standard: <code>mkdir build && cd build && cmake .. && make -j$(nproc)</code>.</p>
                 </div>
                 <div class="step">
                     <span>2</span>
-                    <h3>Configura</h3>
-                    <p>Spiegazione del secondo e fondamentale passaggio.</p>
+                    <h3>Definizione Formato</h3>
+                    <p>Crea un file di configurazione (JSON) che descrive la struttura del tuo messaggio binario.</p>
                 </div>
                 <div class="step">
                     <span>3</span>
-                    <h3>Goditi i Risultati</h3>
-                    <p>Illustrazione del risultato finale che l'utente ottiene.</p>
+                    <h3>Utilizzo</h3>
+                    <p>Integra la libreria nel tuo codice C++ e usa la sua API per codificare/decodificare messaggi.</p>
                 </div>
             </div>
         </section>
 
+        <section id="genesis">
+            <h2>La Genesi di Bixit: Rispondere a Esigenze Reali</h2>
+            <p>
+                Bixit nasce da sfide reali incontrate nell'<strong>industria ferroviaria</strong>, dove una moltitudine di attori scambia una vasta gamma di messaggi binari, ognuno con il proprio formato complesso. Sviluppare software che interagisce con tali flussi di messaggi è spesso <strong>costoso e dispendioso in termini di tempo</strong>, soprattutto durante le fasi di <strong>prototipazione e testing</strong>. Bixit è stato creato per risolvere esattamente questo problema: un dissettore <strong>veloce, profondamente configurabile</strong> e <strong>facile da integrare</strong> che semplifica la pipeline di decodifica dei messaggi, riducendo drasticamente tempi e sforzi, permettendo ai team di ingegneria di concentrarsi su ciò che conta di più: la logica di business.
+            </p>
+        </section>
+
         <section id="cta">
-            <h2>Pronto a Iniziare?</h2>
-            <p>Unisciti a noi e scopri tutto quello che Bixit può offrirti.</p>
-            <a href="#" class="cta-button">Crea il Tuo Account Gratuito</a>
+            <h2>Pronto a Semplificare la Gestione dei Messaggi Binari?</h2>
+            <p>Smetti di lottare con configurazioni complesse e inizia a decodificare ciò che conta davvero.</p>
+            <a href="https://github.com/gitubo/bixit" class="cta-button" target="_blank" rel="noopener noreferrer">Scopri Bixit su GitHub</a>
         </section>
     </main>
 
     <footer>
         <p>&copy; 2025 Bixit. Tutti i diritti riservati.</p>
-        <p><a href="https://github.com/gitubo/bixit" target="_blank">Guarda il progetto su GitHub</a></p>
+        <p><a href="https://github.com/gitubo/bixit" target="_blank" rel="noopener noreferrer">Vedi il Progetto su GitHub</a></p>
+        <p><a href="https://www.gnu.org/licenses/lgpl-3.0" target="_blank" rel="noopener noreferrer">Licenza LGPL v3</a></p>
     </footer>
 
     <script src="script.js"></script>
