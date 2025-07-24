@@ -163,11 +163,16 @@
     <script>
         let currentSlide = 0;
         const images = document.querySelectorAll('.carousel-image');
+        const captions = document.querySelectorAll('.carousel-caption');
         const totalSlides = images.length;
 
         function showSlide(index) {
+            // Hide all images and captions
             images.forEach((img, i) => {
                 img.classList.toggle('active', i === index);
+            });
+            captions.forEach((caption, i) => {
+                caption.classList.toggle('active', i === index);
             });
         }
 
@@ -179,7 +184,7 @@
         // Auto-play carousel
         setInterval(() => {
             moveCarousel(1);
-        }, 4000);
+        }, 5000); // Increased to 5 seconds to read captions
 
         // Initialize
         showSlide(0);
