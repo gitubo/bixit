@@ -16,6 +16,7 @@
                 <li><a href="#features">Features</a></li>
                 <li><a href="#how-it-works">How It Works</a></li>
                 <li><a href="#genesis">The Genesis</a></li>
+                <li><a href="https://github.com/gitubo/bixit" target="_blank" rel="noopener noreferrer" class="github-link">GitHub</a></li>
             </ul>
         </nav>
     </header>
@@ -27,7 +28,12 @@
                 <div class="hero-content">
                     <h1>Bixit: Uncompromising Binary Message Dissection</h1>
                     <p>Bixit is a powerful and configurable binary message dissector designed to convert binary messages into easy-to-read JSON and back.</p>
-                    <a href="#cta" class="cta-button">Get Started Now</a>
+                    <div class="hero-buttons">
+                        <a href="#cta" class="cta-button">Get Started Now</a>
+                        <a href="https://github.com/gitubo/bixit" target="_blank" rel="noopener noreferrer" class="github-button">
+                            <span>⭐</span> View on GitHub
+                        </a>
+                    </div>
                 </div>
                 
                 <!-- Carousel - Right Side -->
@@ -64,7 +70,7 @@
         <section id="features" class="py-16 bg-white">
             <div class="container">
                 <h2 class="text-3xl font-bold text-center mb-12">Features and Benefits</h2>
-                <div class="features-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="features-grid">
                     <div class="feature-item">
                         <span>🌍</span>
                         <h3>Wide Applicability</h3>
@@ -160,34 +166,6 @@
         </div>
     </footer>
 
-    <script>
-        let currentSlide = 0;
-        const images = document.querySelectorAll('.carousel-image');
-        const captions = document.querySelectorAll('.carousel-caption');
-        const totalSlides = images.length;
-
-        function showSlide(index) {
-            // Hide all images and captions
-            images.forEach((img, i) => {
-                img.classList.toggle('active', i === index);
-            });
-            captions.forEach((caption, i) => {
-                caption.classList.toggle('active', i === index);
-            });
-        }
-
-        function moveCarousel(direction) {
-            currentSlide = (currentSlide + direction + totalSlides) % totalSlides;
-            showSlide(currentSlide);
-        }
-
-        // Auto-play carousel
-        setInterval(() => {
-            moveCarousel(1);
-        }, 5000); // Increased to 5 seconds to read captions
-
-        // Initialize
-        showSlide(0);
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
