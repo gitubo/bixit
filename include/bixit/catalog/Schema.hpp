@@ -24,6 +24,13 @@ namespace bixit::catalog {
 
     public:
         Schema() : chain(std::make_shared<Chain>()) {};
+
+        ~Schema();
+        Schema(const Schema& other) = default;
+        Schema& operator=(const Schema& other) = default;
+        Schema(Schema&& other) noexcept = default;
+        Schema& operator=(Schema&& other) noexcept = default;
+
         const std::string getCatalogName() const { return this->catalogName; }
         const std::string getVersion() const { return this->version; }
         const std::unordered_map<std::string, std::string> getMetadata() const { return this->metadata; }

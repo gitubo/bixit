@@ -93,9 +93,6 @@ namespace bixit::abstract_chain {
             uint8_t valueBuffer[8];
             std::memcpy(valueBuffer, reinterpret_cast<const uint8_t*>(&value), 8);
 
-            //memcpy(valueBuffer, &value, 8);   
-//            BitStream bsInteger(valueBuffer, bitLength);
-//            bitStream.append(bsInteger);
             bitStream.append(valueBuffer, bitLength, 8);
 
             // Propagate to the next node (if any)

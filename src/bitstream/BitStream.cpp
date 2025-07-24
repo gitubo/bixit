@@ -4,6 +4,8 @@ using namespace bixit::bitstream;
 
 BitStream::BitStream() : capacity(0), offset(0), buffer(nullptr) {};
 
+BitStream::~BitStream() = default;
+
 BitStream::BitStream(const uint8_t* inputBuffer, size_t initialCapacityInBits)
     : capacity(initialCapacityInBits), offset(0) {
 

@@ -1,12 +1,14 @@
 #include <nlohmann/json.hpp> // Include the nlohmann/json library for JSON handling
 #include <bixit.hpp>       // Include the Bixit library header
+#include <iostream>
 
 int main(int argc, char* argv[])
 {
     // Create a catalog of schemas, loading schemas from the current directory ("./")
     // and setting the logging level to DEBUG for detailed output.
-    auto catalog = std::make_shared<bixit::catalog::SchemaCatalog>("./", bixit::logger::Logger::Level::DEBUG);
-
+    std::string directory_path = "/app/examples";
+    auto catalog = std::make_shared<bixit::catalog::SchemaCatalog>(directory_path, bixit::logger::Logger::Level::DEBUG);
+    
     try
     {
         // Retrieve an abstract chain (the decoder) from the catalog

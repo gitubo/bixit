@@ -12,6 +12,8 @@ using Logger = bixit::logger::Logger;
 using json = nlohmann::json;
 namespace fs = std::filesystem;
 
+SchemaCatalog::~SchemaCatalog() = default;
+Schema::~Schema() = default;
 
 std::unordered_map<std::string, std::string> SchemaCatalog::listFilesRecursive(const std::filesystem::path& directory) {
     std::unordered_map<std::string, std::string> fileMap;
@@ -42,7 +44,8 @@ std::unordered_map<std::string, std::string> SchemaCatalog::listFilesRecursive(c
     return fileMap;
 }
 
-SchemaCatalog::SchemaCatalog(const std::string& originDirectory, const Logger::Level logLevel) 
+
+SchemaCatalog::SchemaCatalog(const std::string& originDirectory, const bixit::logger::Logger::Level logLevel) 
     : originDirectory(originDirectory), schemaMap() {
 
     Logger::getInstance().setSeverity(logLevel);
@@ -69,17 +72,12 @@ SchemaCatalog::SchemaCatalog(const std::string& originDirectory, const Logger::L
             if (!inputFile.is_open()) {
                 Logger::getInstance().error("Unable to open file: " + schemaFilePath);
                 return; 
-            }
-                
-            try {
-                jsonData = nlohmann::json::parse(inputFile);                
-            } catch (const nlohmann::json::parse_error& e) {
-                return;
-            } catch (const std::exception& e) {
-                return;
-            }
+            }                
+            jsonData = nlohmann::json::parse(inputFile);                
             inputFile.close();
-
+        } catch (const nlohmann::json::parse_error& e) {
+            Logger::getInstance().error("Unable to parse file: " + schemaFilePath);
+            return;
         } catch (const std::exception& e) {
             Logger::getInstance().error("Unexpected error loading file (" + schemaFilePath + "): " + std::string(e.what()));
             return;
@@ -136,8 +134,12 @@ int SchemaCatalog::parseSchema(const std::string& name, const nlohmann::json& js
     schema->setCatalogName(name);
 //    schemaMap[name] = *schema;
 //    schemaMap[name] = schema;
+    Logger::getInstance().debug("Catlaog name set");
     if (!name.empty() && std::all_of(name.begin(), name.end(), ::isprint)) {
+        Logger::getInstance().debug("Ready to insert");
         schemaMap.insert({name, schema});
+        Logger::getInstance().debug("Inserted");
+
         /*
         auto [it, inserted] = schemaMap.try_emplace(name, schema);
         if (!inserted) {
@@ -148,10 +150,11 @@ int SchemaCatalog::parseSchema(const std::string& name, const nlohmann::json& js
         Logger::getInstance().error("Invalid name <" + name + ">");
         return 2;
     }
+    Logger::getInstance().debug("Returning ok");
     return 0;
 }
 
-const std::shared_ptr<Schema> SchemaCatalog::parseSchema(const nlohmann::json& jsonSchema) {
+std::shared_ptr<Schema> SchemaCatalog::parseSchema(const nlohmann::json& jsonSchema) {
     std::shared_ptr<Schema> schema = std::make_shared<Schema>();
     if(jsonSchema.is_object()){
         for (const auto& [key, val] : jsonSchema.items()) {

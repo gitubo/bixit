@@ -28,6 +28,8 @@ namespace bixit::bitstream {
         BitStream(const std::string&);
         BitStream(const std::string&, const size_t);
 
+        ~BitStream();
+
         void set(const uint8_t*, size_t);
 
         std::unique_ptr<uint8_t[]> read(size_t) const;

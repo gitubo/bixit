@@ -33,14 +33,21 @@ namespace bixit::catalog {
 
     public:
 
-        SchemaCatalog(const std::string&, const Logger::Level);
+        SchemaCatalog(const std::string&, const bixit::logger::Logger::Level);
+
+        ~SchemaCatalog();
+        SchemaCatalog(const SchemaCatalog&) = delete;
+        SchemaCatalog& operator=(const SchemaCatalog&) = delete;
+        SchemaCatalog(SchemaCatalog&&) noexcept = default;
+        SchemaCatalog& operator=(SchemaCatalog&&) noexcept = default;
+        
         const std::shared_ptr<ChainNode> getAbstractChain(const std::string& key) const;
         const std::shared_ptr<ChainNode> parseSchemaOnTheFly(const nlohmann::json&);
         std::string to_string(size_t) const;
 
     private:
         int parseSchema(const std::string&, const nlohmann::json&);
-        const std::shared_ptr<Schema> parseSchema(const nlohmann::json&);
+        std::shared_ptr<Schema> parseSchema(const nlohmann::json&);
 
         std::optional<std::shared_ptr<ChainNode>> evalArray(const nlohmann::json&, const std::shared_ptr<ChainAccess>);
         std::optional<std::shared_ptr<ChainNode>> evalObject(const nlohmann::json&, const std::shared_ptr<ChainAccess>);
