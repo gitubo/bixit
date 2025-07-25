@@ -248,7 +248,17 @@ section h2 {
     color: #6b7280;
     line-height: 1.6;
 }
+.feature-name {
+    display: flex;
+    flex-direction: column; /* Rende il contenuto della cella una colonna */
+    align-items: flex-start; /* Allinea il testo a sinistra */
+}
 
+.feature-subtitle {
+    font-size: 0.85em; /* Rende il sottotitolo leggermente più piccolo del testo principale */
+    color: #777; /* Un colore grigio più chiaro per distinguerlo */
+    margin-top: 0.2em; /* Un piccolo margine sopra per separarlo dal titolo */
+}
 /* Comparison Table Styles */
 .comparison-table {
     background: white;
