@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bixit WASM Module Demo</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        h1 {
+            text-align: center;
+            color: #4a5568;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border-radius: 10px;
+            background: linear-gradient(145deg, #f7fafc, #edf2f7);
+            box-shadow: inset 5px 5px 10px #d1d9e6, inset -5px -5px 10px #ffffff;
+        }
+
+        .section h3 {
+            color: #2d3748;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background: #ffffff;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: translateY(-1px);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+            min-height: 50px;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+        }
+
+        .result.success {
+            background: #f0fff4;
+            border-color: #68d391;
+            color: #22543d;
+        }
+
+        .result.error {
+            background: #fed7d7;
+            border-color: #fc8181;
+            color: #742a2a;
+        }
+
+        .status {
+            text-align: center;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .status.loading {
+            background: #bee3f8;
+            color: #2b6cb0;
+        }
+
+        .status.ready {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .status.error {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .code-example {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            overflow-x: auto;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Bixit WASM Module Demo</h1>
+        
+        <div id="status" class="status loading">
+            Loading WASM module...
+        </div>
+
+        <div class="grid">
+            <div class="section">
+                <h3>📤 B to J Conversion</h3>
+                <div class="input-group">
+                    <label for="b2j-metadata">Metadata (M):</label>
+                    <textarea id="b2j-metadata" placeholder="Enter metadata string...">{"format": "example", "version": "1.0"}</textarea>
+                </div>
+                <div class="input-group">
+                    <label for="b2j-input">B Format Input:</label>
+                    <textarea id="b2j-input" placeholder="Enter B format data...">binary_data_example_123</textarea>
+                </div>
+                <button id="b2j-convert" disabled>Convert B → J</button>
+                <div id="b2j-result" class="result">Results will appear here...</div>
+            </div>
+
+            <div class="section">
+                <h3>📥 J to B Conversion</h3>
+                <div class="input-group">
+                    <label for="j2b-metadata">Metadata (M):</label>
+                    <textarea id="j2b-metadata" placeholder="Enter metadata string...">{"format": "example", "version": "1.0"}</textarea>
+                </div>
+                <div class="input-group">
+                    <label for="j2b-input">J Format Input:</label>
+                    <textarea id="j2b-input" placeholder="Enter J format data...">{"data": "json_example", "value": 456}</textarea>
+                </div>
+                <button id="j2b-convert" disabled>Convert J → B</button>
+                <div id="j2b-result" class="result">Results will appear here...</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>📋 Usage Instructions</h3>
+            <p><strong>Prerequisites:</strong></p>
+            <ol>
+                <li>Place your compiled <code>bixit_module.js</code> and <code>bixit_module.wasm</code> files in the same directory as this HTML file</li>
+                <li>Serve this page from a web server (not file://) due to CORS restrictions</li>
+            </ol>
+            
+            <p><strong>To compile your C++ code to WASM:</strong></p>
+            <div class="code-example">mkdir build && cd build
+cmake .. -DCMAKE_TOOLCHAIN_FILE=$EMSCRIPTEN/cmake/Modules/Platform/Emscripten.cmake
+make</div>
+        </div>
+    </div>
+
+<script type="module">
+    import createBixitModule from './bixit_module.js';
+
+    const statusEl = document.getElementById('status');
+    const b2jBtn = document.getElementById('b2j-convert');
+    const j2bBtn = document.getElementById('j2b-convert');
+
+    let BixitModule; // Declare a variable to hold the initialized module
+
+    function updateStatus(type, message) {
+        statusEl.className = `status ${type}`;
+        statusEl.textContent = message;
+    }
+
+    function showResult(elementId, type, message) {
+        const resultEl = document.getElementById(elementId);
+        resultEl.className = `result ${type}`;
+        resultEl.textContent = message;
+    }
+
+    updateStatus('loading', 'Loading WASM module...');
+
+    createBixitModule().then(Module => {
+        BixitModule = Module; // Assign the loaded module to the global variable
+
+        // Emscripten's onRuntimeInitialized is the safest place to interact with compiled C functions and memory management.
+        if (BixitModule.calledRun) {
+            // If the runtime is already initialized (e.g., in some deferred loading scenarios)
+            initializeBixitFunctions();
+        } else {
+            // Otherwise, wait for the runtime to be initialized
+            BixitModule.onRuntimeInitialized = () => {
+                initializeBixitFunctions();
+            };
+        }
+    }).catch(error => {
+        console.error("Error loading WASM module:", error);
+        updateStatus('error', `❌ Error loading WASM module: ${error}`);
+    });
+
+    function initializeBixitFunctions() {
+        updateStatus('ready', '✅ WASM module loaded! Ready for conversions.');
+
+        const b2jFunc = BixitModule.cwrap('b2j', 'number', ['string', 'string', 'number', 'number']);
+        const j2bFunc = BixitModule.cwrap('j2b', 'number', ['string', 'string', 'number', 'number']);
+
+        b2jBtn.addEventListener('click', () => {
+            const metadata = document.getElementById('b2j-metadata').value;
+            const bInput = document.getElementById('b2j-input').value;
+            executeConversion(b2jFunc, metadata, bInput, 'b2j-result');
+        });
+
+        j2bBtn.addEventListener('click', () => {
+            const metadata = document.getElementById('j2b-metadata').value;
+            const jInput = document.getElementById('j2b-input').value;
+            executeConversion(j2bFunc, metadata, jInput, 'j2b-result');
+        });
+
+        b2jBtn.disabled = false;
+        j2bBtn.disabled = false;
+    }
+
+    function executeConversion(wasmFunc, metadata, input, resultElementId) {
+        if (!metadata.trim() || !input.trim()) {
+            showResult(resultElementId, 'error', 'Please fill in both input fields.');
+            return;
+        }
+        try {
+            const bufferSize = 4096;
+            // Now, BixitModule._malloc and BixitModule.UTF8ToString should be available
+            const outputBuffer = BixitModule._malloc(bufferSize);
+            const result = wasmFunc(metadata, input, outputBuffer, bufferSize);
+
+            if (result === 0) {
+                const outputString = BixitModule.UTF8ToString(outputBuffer);
+                showResult(resultElementId, 'success', `✅ Conversion successful!\n\nResult: ${outputString}`);
+            } else {
+                showResult(resultElementId, 'error', `❌ Conversion failed with error code: ${result}`);
+            }
+            BixitModule._free(outputBuffer);
+        } catch (error) {
+            showResult(resultElementId, 'error', `❌ Error during conversion: ${error.message}`);
+        }
+    }
+</script>
+</body>
+</html>
