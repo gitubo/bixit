@@ -1,6 +1,6 @@
 # Bixit
 
-[![License: LGPL v3](https://img.shields.io/badge/License-LGPL_v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 **Bixit** is a powerful and configurable binary message dissector designed to convert binary messages into easy-to-read JSON and back. It offers a highly configurable and fast (de)serialization engine designed to handle even the most demanding use cases, including bit-level precision, non-byte-aligned data, complex structures and conditional decoding logic.
 
