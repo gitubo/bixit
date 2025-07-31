@@ -14,6 +14,7 @@
             <div class="logo">Bixit</div>
             <ul class="flex space-x-6">
                 <li><a href="#features">Features</a></li>
+                <li><a href="#try-it">Try it</a></li>
                 <li><a href="#comparison">Comparison</a></li>
                 <li><a href="#how-it-works">How It Works</a></li>
                 <li><a href="#genesis">The Genesis</a></li>
@@ -26,10 +27,12 @@
         <section id="hero" class="bg-gradient-to-r from-blue-50 to-white py-20">
             <div class="hero-container">
                 <div class="hero-content">
-                    <h1><span class="highlight">Accelerate</span> development through a flexible message parser</h1>
+                    <h1>
+                        Develop your binary message parser in <del>days</del> <span class="highlight"><i>minutes</i></span>
+                    </h1>
                     <p>A powerful and configurable binary message parser designed to convert bits into readable JSON and back.</p>
                     <div class="hero-buttons">
-                        <a href="#cta" class="cta-button">Get Started Now</a>
+                        <a href="#try-it" class="cta-button">Try It Now</a>
                     </div>
                 </div>
                 
@@ -109,12 +112,233 @@
                 </div>
             </div>
         </section>
+<section id="try-it" class="py-16 bg-white">
+    <div class="container">
+        <h2 class="text-3xl font-bold text-center mb-12">Try Bixit Now!</h2>
 
+        <div class="grid grid-rows-2 gap-8">
+            <div class="row-span-1 grid grid-cols-[2fr_1fr] gap-8 items-start">
+                <div class="flex flex-col">
+                    <label for="b2j-metadata" class="text-lg font-semibold mb-2 block">Schema</label>
+                    <textarea id="b2j-metadata" rows="8" class="text-xs border p-4 rounded-md resize-none w-full"></textarea>
+                </div>
+
+                <div class="flex flex-col gap-4">
+                    <p class="text-sm text-gray-700">Describe the format of your message or try one of the example below.</p>
+                    <select id="schema-selector" class="text-sm border p-2 rounded-md w-full">
+                        <option value="">Select a predefined format...</option>
+                        <option value="canbus">CAN (standard)</option>
+                        <option value="schema2">Schema di Esempio 2</option>
+                        <option value="schema3">Schema di Esempio 3</option>
+                    </select>
+                    <p id="schema-description" class="text-sm text-gray-500 italic">If you have no idea how to start, just select one of the provided examples</p>
+                </div>
+            </div>
+
+            <div class="row-span-1 grid grid-cols-[1fr_auto_1fr] gap-8 items-start">
+                <div class="flex flex-col">
+                    <label for="b2j-input" class="text-lg font-semibold mb-2">Bitstream</label>
+                    <textarea id="b2j-input" rows="10" class="border p-4 rounded-md resize-none w-full" placeholder="Write your bitstream here (101001101010...)"></textarea>
+                </div>
+
+                <div class="flex flex-col items-center justify-center gap-4 py-8">
+                    <input type="hidden" id="b2j-extra-int" value="0">
+                    <button id="b2j-convert" class="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition duration-300 w-full flex items-center justify-center gap-2" disabled>
+                        
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10.293 15.707a1 1 0 010-1.414L14.586 10l-4.293-4.293a1 1 0 111.414-1.414l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                            <path fill-rule="evenodd" d="M4.293 15.707a1 1 0 010-1.414L8.586 10l-4.293-4.293a1 1 0 111.414-1.414l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                    <button id="j2b-convert" class="bg-gray-600 text-white px-6 py-3 rounded-md hover:bg-gray-700 transition duration-300 w-full flex items-center justify-center gap-2" disabled>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M9.707 4.293a1 1 0 010 1.414L5.414 10l4.293 4.293a1 1 0 01-1.414 1.414l-5-5a1 1 0 010-1.414l5-5a1 1 0 011.414 0z" clip-rule="evenodd" />
+                            <path fill-rule="evenodd" d="M15.707 4.293a1 1 0 010 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414l-5-5a1 1 0 010-1.414l5-5a1 1 0 011.414 0z" clip-rule="evenodd" />
+                        </svg>
+                        
+                    </button>
+                </div>
+
+                <div class="flex flex-col">
+                    <label for="j2b-input" class="text-lg font-semibold mb-2">JSON</label>
+                    <textarea id="j2b-input" rows="10" class="border p-4 rounded-md resize-none w-full" placeholder="Write the JSON representation of your message here."></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const schemaSelector = document.getElementById('schema-selector');
+        const schemaDescription = document.getElementById('schema-description');
+        const b2jMetadata = document.getElementById('b2j-metadata');
+
+        schemaSelector.addEventListener('change', function() {
+            const selectedValue = this.value;
+            let descriptionText = '';
+            let schemaContent = '';
+
+            switch (selectedValue) {
+                case 'canbus':
+                    descriptionText = 'CANBUS standard message schema.';
+                    schemaContent = `{
+    "1": {
+        "name": "main",
+        "type": "root",
+        "next_node": "2"
+    },
+    "2": {
+        "name": "start_of_frame",
+        "type": "unsigned integer",
+        "next_node": "3",
+        "attributes": {
+            "bit_length": 1,
+            "endianness": "big"
+        }
+    },
+    "3": {
+        "name": "identifier",
+        "type": "unsigned integer",
+        "next_node": "4",
+        "attributes": {
+            "bit_length": 11,
+            "endianness": "big"
+        }
+    },
+    "4": {
+        "name": "RTR",
+        "type": "unsigned integer",
+        "next_node": "5",
+        "attributes": {
+            "bit_length": 1,
+            "endianness": "big"
+        }
+    },
+    "5": {
+        "name": "IDE",
+        "type": "unsigned integer",
+        "next_node": "301",
+        "attributes": {
+            "bit_length": 1,
+            "endianness": "big"
+        }
+    },
+    "101": {
+        "name": "DLC",
+        "type": "unsigned integer",
+        "next_node": "102",
+        "attributes": {
+            "bit_length": 4,
+            "endianness": "big"
+        }
+    },
+    "102": {
+        "name": "__array__",
+        "type": "array",
+        "next_node": "103",
+        "attributes": {
+            "is_flatten": true,
+            "repetitions": "/DLC",
+            "is_absolute_reference": true,
+            "array_node_id": "1000"
+        }
+    },
+    "103": {
+        "name": "CRC",
+        "type": "unsigned integer",
+        "next_node": "104",
+        "attributes": {
+            "bit_length": 15,
+            "endianness": "big"
+        }
+    },
+    "104": {
+        "name": "CRC_delimiter",
+        "type": "unsigned integer",
+        "next_node": "105",
+        "attributes": {
+            "bit_length": 1,
+            "endianness": "big"
+        }
+    },
+    "105": {
+        "name": "ACK",
+        "type": "unsigned integer",
+        "next_node": "106",
+        "attributes": {
+            "bit_length": 1,
+            "endianness": "big"
+        }
+    },
+    "106": {
+        "name": "ACK_delimiter",
+        "type": "unsigned integer",
+        "next_node": "107",
+        "attributes": {
+            "bit_length": 1,
+            "endianness": "big"
+        }
+    },
+    "107": {
+        "name": "EOF",
+        "type": "unsigned integer",
+        "next_node": "",
+        "attributes": {
+            "bit_length": 7,
+            "endianness": "big"
+        }
+    },
+    "301": {
+        "name": "Reserved",
+        "type": "unsigned integer",
+        "next_node": "101",
+        "attributes": {
+            "bit_length": 1,
+            "endianness": "big"
+        }
+    },
+    "1000": {
+        "name": "data",
+        "type": "unsigned integer",
+        "next_node": "",
+        "attributes": {
+            "bit_length": 8,
+            "endianness": "big"
+        }
+    }
+}`;
+                    break;
+                case 'schema2':
+                    descriptionText = 'Schema per i dettagli del prodotto.';
+                    schemaContent = `{
+    "productId": "integer",
+    "productName": "string",
+    "price": "float",
+    "inStock": "boolean"
+}`;
+                    break;
+                case 'schema3':
+                    descriptionText = 'Schema per un semplice messaggio.';
+                    schemaContent = `{
+    "messageId": "integer",
+    "text": "string"
+}`;
+                    break;
+                default:
+                    descriptionText = 'Il testo cambierà in base alla selezione.';
+                    schemaContent = '';
+            }
+            schemaDescription.textContent = descriptionText;
+            b2jMetadata.value = schemaContent;
+        });
+    });
+</script>
         <section id="comparison" class="py-16 bg-gray-50">
             <div class="container">
                 <h2 class="text-3xl font-bold text-center mb-12">Why Choose Bixit?</h2>
                 <p class="text-lg text-center mb-8 max-w-3xl mx-auto">
-                    Compare Bixit with othersolutions and see why it stands out.
+                    Compare Bixit with other solutions and see why it stands out.
                 </p>
                 <div class="comparison-table">
                     <table>
@@ -239,5 +463,117 @@
     </footer>
 
     <script src="script.js"></script>
+
+    <script type="module">
+        import createBixitModule from './bixit_module.js';
+        const b2jBtn = document.getElementById('b2j-convert');
+        const j2bBtn = document.getElementById('j2b-convert');
+
+        let BixitModule; 
+
+        function updateStatus(message) {
+            console.log("Parser: " + message);
+        }
+
+        function showResult(elementId, type, message) {
+            const resultEl = document.getElementById(elementId);
+
+            resultEl.textContent = message;
+        }
+
+        function binToB64(binaryString) {
+            if (!binaryString) return '';
+
+            if (!/^[01]*$/.test(binaryString)) {
+                console.error("Invalid binary string:", binaryString);
+                return '';
+            }
+
+            const paddedBinaryString = binaryString + '0'.repeat((8 - (binaryString.length % 8)) % 8);
+
+            let byteString = '';
+            for (let i = 0; i < paddedBinaryString.length; i += 8) {
+                const byte = parseInt(paddedBinaryString.substring(i, i + 8), 2);
+                byteString += String.fromCharCode(byte);
+            }
+            return btoa(byteString);
+        }
+
+        updateStatus('Loading...');
+
+        createBixitModule().then(Module => {
+            BixitModule = Module; 
+            if (BixitModule.calledRun) {
+                initializeBixitFunctions();
+            } else {
+                BixitModule.onRuntimeInitialized = () => {
+                    initializeBixitFunctions();
+                };
+            }
+        }).catch(error => {
+            updateStatus(`Error: ${error}`);
+        });
+
+        function initializeBixitFunctions() {
+            updateStatus('Loaded');
+            const b2jFunc = BixitModule.cwrap('b2j', 'number', ['string', 'string', 'number', 'number', 'number']);
+            const j2bFunc = BixitModule.cwrap('j2b', 'number', ['string', 'string', 'number', 'number']);
+
+            b2jBtn.addEventListener('click', () => {
+                const pre_metadata = '{   "version": "0.1",   "metadata": {     "name": "",     "description": ""   },  "nodes": ';
+                const post_metadata = '}';
+                const metadata = pre_metadata + document.getElementById('b2j-metadata').value.replace(/[\n\t\s]/g, '') + post_metadata;
+                const originalBInput = document.getElementById('b2j-input').value; 
+                
+                const extraIntEl = document.getElementById('b2j-extra-int');
+                const extraInt = originalBInput.length;
+                extraIntEl.value = extraInt; 
+
+                const bInputBase64 = binToB64(originalBInput);
+                if (!bInputBase64) {
+                    showResult('b2j-result', 'error', 'Invalid BitStream: Must be a string of 0s and 1s.');
+                    return;
+                }
+                executeConversion(b2jFunc, metadata, bInputBase64, extraInt, 'j2b-input');
+            });
+
+            j2bBtn.addEventListener('click', () => {
+                const metadata = document.getElementById('b2j-metadata').value;
+                const jInput = document.getElementById('j2b-input').value.trim();
+                executeConversion(j2bFunc, metadata, jInput, null, 'b2j-input');
+            });
+
+            b2jBtn.disabled = false;
+            j2bBtn.disabled = false;
+        }
+
+        function executeConversion(wasmFunc, metadata, input, extraIntParam, resultElementId) {
+            if (!metadata.trim() || !input.trim()) {
+                showResult(resultElementId, 'error', 'Please fill both the schema and one of the input fields.');
+                return;
+            }
+            try {
+                const bufferSize = 4096;
+                const outputBuffer = BixitModule._malloc(bufferSize);
+                let result;
+
+                if (extraIntParam !== null && extraIntParam !== undefined) {
+                    result = wasmFunc(metadata, input, extraIntParam, outputBuffer, bufferSize);
+                } else {
+                    result = wasmFunc(metadata, input, outputBuffer, bufferSize);
+                }
+
+                if (result === 0) {
+                    const outputString = BixitModule.UTF8ToString(outputBuffer);
+                    showResult(resultElementId, 'success', `${outputString}`);
+                } else {
+                    showResult(resultElementId, 'error', `❌ Conversion failed with error code: ${result}`);
+                }
+                BixitModule._free(outputBuffer);
+            } catch (error) {
+                showResult(resultElementId, 'error', `❌ Error during conversion: ${error.message}`);
+            }
+        }
+    </script>
 </body>
 </html>
