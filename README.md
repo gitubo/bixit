@@ -16,6 +16,19 @@ Binary messages are concise and efficient, but they have a rigid format, which o
 * **Easy Integration:** Lightweight and linkable C++ shared library.
 * **Multi-Format Management:** Organize and manage multiple formats and versions in a structured catalog.
 
+**Supported Base Types**
+
+- **Unsigned integers**: You can define fields with a custom number of bits (not necessarily multiples of 8) and choose the desired endianness.
+
+**Supported Logical Constructs**
+
+- **Data arrays**: Define arrays with either fixed lengths or lengths that depend on the value of other fields in the message.
+- **Conditional fields**: Include or exclude parts of the message structure dynamically, based on conditions tied to other field values.
+- **Decoding routing**: Direct the decoding flow through specific branches depending on message content.
+- **Custom logic**: Extend functionality with user-defined logic via embedded **Lua** scripting.
+
+This flexible internal design makes Bixit a powerful tool for building robust and adaptable message parsers tailored to complex binary protocols.
+
 ## Getting Started
 
 1.  **Installation:** Bixit uses CMake as its build system. To build and install the library, follow the standard CMake workflow:
@@ -58,19 +71,6 @@ Bixit is built around a **modular architecture**, making it easy to extend and e
 - Interfacing hooks  
 - Decoding flow control  
 - A rich set of logical constructs
-
-### Supported Base Types
-
-- **Unsigned integers**: You can define fields with a custom number of bits (not necessarily multiples of 8) and choose the desired endianness.
-
-### Supported Logical Constructs
-
-- **Data arrays**: Define arrays with either fixed lengths or lengths that depend on the value of other fields in the message.
-- **Conditional fields**: Include or exclude parts of the message structure dynamically, based on conditions tied to other field values.
-- **Decoding routing**: Direct the decoding flow through specific branches depending on message content.
-- **Custom logic**: Extend functionality with user-defined logic via embedded **Lua** scripting.
-
-This flexible internal design makes Bixit a powerful tool for building robust and adaptable message parsers tailored to complex binary protocols.
 
 ## Example: CAN format
 
