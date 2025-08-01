@@ -148,7 +148,7 @@
                             <path fill-rule="evenodd" d="M4.293 15.707a1 1 0 010-1.414L8.586 10l-4.293-4.293a1 1 0 111.414-1.414l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0z" clip-rule="evenodd" />
                         </svg>
                     </button>
-                    <button id="j2b-convert" class="bg-gray-600 text-white px-6 py-3 rounded-md hover:bg-gray-700 transition duration-300 w-full flex items-center justify-center gap-2" disabled>
+                    <button id="j2b-convert" class="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition duration-300 w-full flex items-center justify-center gap-2" disabled>
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd" d="M9.707 4.293a1 1 0 010 1.414L5.414 10l4.293 4.293a1 1 0 01-1.414 1.414l-5-5a1 1 0 010-1.414l5-5a1 1 0 011.414 0z" clip-rule="evenodd" />
                             <path fill-rule="evenodd" d="M15.707 4.293a1 1 0 010 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414l-5-5a1 1 0 010-1.414l5-5a1 1 0 011.414 0z" clip-rule="evenodd" />
@@ -363,14 +363,9 @@
 
         let BixitModule; 
 
-        function updateStatus(message) {
-            console.log("Parser: " + message);
-        }
-
-        function showResult(elementId, type, message) {
+        function showResult(elementId, message) {
             const resultEl = document.getElementById(elementId);
-
-            resultEl.textContent = message;
+            resultEl.value = message;
         }
 
         function binToB64(binaryString) {
@@ -391,8 +386,6 @@
             return btoa(byteString);
         }
 
-        updateStatus('Loading...');
-
         createBixitModule().then(Module => {
             BixitModule = Module; 
             if (BixitModule.calledRun) {
@@ -403,17 +396,16 @@
                 };
             }
         }).catch(error => {
-            updateStatus(`Error: ${error}`);
+            consol.error(`Error loading parser: ${error}`);
         });
 
         function initializeBixitFunctions() {
-            updateStatus('Loaded');
             const b2jFunc = BixitModule.cwrap('b2j', 'number', ['string', 'string', 'number', 'number', 'number']);
             const j2bFunc = BixitModule.cwrap('j2b', 'number', ['string', 'string', 'number', 'number']);
-
+            const pre_metadata = '{   "version": "0.1",   "metadata": {     "name": "",     "description": ""   },  "nodes": ';
+            const post_metadata = '}';
+                
             b2jBtn.addEventListener('click', () => {
-                const pre_metadata = '{   "version": "0.1",   "metadata": {     "name": "",     "description": ""   },  "nodes": ';
-                const post_metadata = '}';
                 const metadata = pre_metadata + document.getElementById('b2j-metadata').value.replace(/[\n\t]/g, '') + post_metadata;
                 const originalBInput = document.getElementById('b2j-input').value; 
                 
@@ -423,14 +415,14 @@
 
                 const bInputBase64 = binToB64(originalBInput);
                 if (!bInputBase64) {
-                    showResult('b2j-result', 'error', 'Invalid BitStream: Must be a string of 0s and 1s.');
+                    showResult('b2j-result', 'Invalid BitStream: Must be a string of 0s and 1s.');
                     return;
                 }
                 executeConversion(b2jFunc, metadata, bInputBase64, extraInt, 'j2b-input');
             });
 
             j2bBtn.addEventListener('click', () => {
-                const metadata = document.getElementById('b2j-metadata').value;
+                const metadata = pre_metadata + document.getElementById('b2j-metadata').value.replace(/[\n\t]/g, '') + post_metadata;
                 const jInput = document.getElementById('j2b-input').value.trim();
                 executeConversion(j2bFunc, metadata, jInput, null, 'b2j-input');
             });
@@ -441,7 +433,7 @@
 
         function executeConversion(wasmFunc, metadata, input, extraIntParam, resultElementId) {
             if (!metadata.trim() || !input.trim()) {
-                showResult(resultElementId, 'error', 'Please fill both the schema and one of the input fields.');
+                showResult(resultElementId, 'Please fill both the schema and one of the input fields.');
                 return;
             }
             try {
@@ -457,13 +449,14 @@
 
                 if (result === 0) {
                     const outputString = BixitModule.UTF8ToString(outputBuffer);
-                    showResult(resultElementId, 'success', `${outputString}`);
+                    console.log("<" +outputString+ ">")
+                    showResult(resultElementId, `${outputString}`);
                 } else {
-                    showResult(resultElementId, 'error', `❌ Conversion failed with error code: ${result}`);
+                    showResult(resultElementId, `❌ Conversion failed with error code: ${result}`);
                 }
                 BixitModule._free(outputBuffer);
             } catch (error) {
-                showResult(resultElementId, 'error', `❌ Error during conversion: ${error.message}`);
+                showResult(resultElementId, `❌ Error during conversion: ${error.message}`);
             }
         }
     </script>
