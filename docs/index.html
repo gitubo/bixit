@@ -201,20 +201,17 @@ document.getElementById('contact-form').addEventListener('submit', function(e) {
   e.preventDefault();
 
   const form = e.target;
-  const data = Object.fromEntries(new FormData(form));
+  const formData = new URLSearchParams(new FormData(form)); // crea urlencoded
 
   // Honeypot check
-  if (data.website && data.website.trim() !== "") return;
+  if (formData.get('website') && formData.get('website').trim() !== "") return;
 
   fetch("https://script.google.com/macros/s/AKfycbzAimuZzGJba8jL8rv-5q5QeZe1L9YavojXZXKPwQa2LFRE03P9oLq5q3d1IJTEww/exec", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      name: data.name,
-      email: data.email,
-      message: data.message,
-      website: data.website
-    })
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded"
+    },
+    body: formData.toString()
   })
   .then(res => res.json())
   .then(response => {
@@ -230,6 +227,7 @@ document.getElementById('contact-form').addEventListener('submit', function(e) {
     alert("Error submitting form.");
   });
 });
+
 </script>
 
 <script>
@@ -528,6 +526,7 @@ document.getElementById('contact-form').addEventListener('submit', function(e) {
 </body>
 
 </html>
+
 
 
 
