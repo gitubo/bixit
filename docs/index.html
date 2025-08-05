@@ -199,14 +199,12 @@
 <script>
 document.getElementById('contact-form').addEventListener('submit', function(e) {
   e.preventDefault();
+
   const form = e.target;
   const data = Object.fromEntries(new FormData(form));
 
   // Honeypot check
-  if (data.website) {
-    console.warn("Bot submission blocked.");
-    return;
-  }
+  if (data.website && data.website.trim() !== "") return;
 
   fetch("https://script.google.com/macros/s/AKfycbzAimuZzGJba8jL8rv-5q5QeZe1L9YavojXZXKPwQa2LFRE03P9oLq5q3d1IJTEww/exec", {
     method: "POST",
@@ -214,7 +212,8 @@ document.getElementById('contact-form').addEventListener('submit', function(e) {
     body: JSON.stringify({
       name: data.name,
       email: data.email,
-      message: data.message
+      message: data.message,
+      website: data.website
     })
   })
   .then(res => res.json())
@@ -223,12 +222,12 @@ document.getElementById('contact-form').addEventListener('submit', function(e) {
       document.getElementById('form-response').classList.remove('hidden');
       form.reset();
     } else {
-      alert("There was a problem. Please try again.");
+      alert("Submission failed.");
     }
   })
   .catch(err => {
-    console.error("Error submitting form", err);
-    alert("Error submitting form");
+    console.error("Error submitting form:", err);
+    alert("Error submitting form.");
   });
 });
 </script>
@@ -529,5 +528,6 @@ document.getElementById('contact-form').addEventListener('submit', function(e) {
 </body>
 
 </html>
+
 
 
